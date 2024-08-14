@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #0B0C0D; /* Dark background */
+            height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Prevent scrolling */
+        }
+        
+        .navbar {
+            background: #00723F; /* Dark green background */
+            color: white;
+            padding: 10px 20px; /* Adjusted padding */
+            box-sizing: border-box; /* Include padding in height calculation */
+            width: 100%;
+            position: fixed; /* Fixed position */
+            top: 0; /* Align to top */
+            left: 0; /* Align to left */
+            z-index: 1000; /* Ensure it sits above other content */
+        }
+        
+        .navbar h1 {
+            margin: 0;
+            font-size: 1.4em; /* Adjust font size */
+        }
+        
+        .chat-container {
+            display: flex;
+            margin-top: 60px; /* Ensure chat container starts below navbar */
+        }
+        
+        .chat-sidebar {
+            width: 300px; /* Sidebar width */
+            background: #1E1E1E; /* Slightly lighter dark background */
+            border-right: 1px solid #333; /* Darker border */
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            padding-top: 70px; /* Added padding to ensure heading is visible */
+            box-sizing: border-box;
+            height: 100vh; /* Full viewport height */
+            position: fixed; /* Fixed position */
+            left: 0; /* Align to left side */
+            top: 0; /* Align to top, below navbar */
+            z-index: 999; /* Ensure it sits below navbar */
+        }
+        
+        .chat-sidebar h2 {
+            margin-top: 0;
+            font-size: 1.6em; /* Larger font size */
+            color: #FFFFFF; /* White text color */
+        }
+        
+        #chatList {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            height: calc(100vh - 120px); /* Adjust height based on sidebar padding and navbar height */
+        }
+        
+        #chatList li {
+            padding: 15px; /* Increased padding */
+            margin-bottom: 10px;
+            background: #333; /* Darker background for chat items */
+            color: #fff; /* White text color */
+            border: 1px solid #444; /* Darker border */
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        #chatList li:hover {
+            background: #444; /* Lighter dark background on hover */
+        }
+        
+        .chat-main-container {
+            margin-left: 300px; /* Adjust margin to account for fixed sidebar width */
+            width: calc(100% - 300px); /* Adjust width to fit remaining space */
+            height: calc(100vh - 60px); /* Full viewport height minus navbar height */
+            display: flex;
+            flex-direction: column;
+            z-index: 100; /* Ensure chat container is above sidebar but below navbar */
+        }
+        
+        .chat-header {
+            background: #110072; /* Dark blue background */
+            color: white;
+            padding: 20px; /* Increased padding */
+            text-align: center;
+            font-size: 1.6em; /* Larger font size for header */
+        }
+        
+        .chat-main {
+            flex: 1;
+            padding: 20px; /* Increased padding */
+            overflow-y: auto;
+            box-sizing: border-box; /* Include padding in height calculation */
+        }
+        
+        .messages {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            margin-bottom: 15px; /* Increased margin for better spacing */
+            position: relative;
+            z-index: 10; /* Ensure messages appear above background */
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            background: #00723F; /* Dark background for user messages */
+            color: #e1ffc7; /* Light text color */
+            padding: 12px; /* Increased padding */
+            border-radius: 15px; /* Larger border radius */
+            max-width: 70%; /* Limit width */
+        }
+        
+        .message.bot {
+            align-self: flex-start;
+            background: #2E2E2E; /* Slightly lighter dark background for bot messages */
+            color: #e1e1e1; /* Light text color */
+            padding: 12px; /* Increased padding */
+            border-radius: 15px; /* Larger border radius */
+            max-width: 70%; /* Limit width */
+        }
+        
+        .chat-footer {
+            display: flex;
+            align-items: center; /* Align items vertically */
+            padding: 10px 20px; /* Adjusted padding for footer */
+            background: #1E1E1E; /* Dark background */
+            border-top: 1px solid #333; /* Darker border */
+            box-sizing: border-box; /* Include padding in height calculation */
+            position: relative; /* For positioning the send button */
+        }
+        
+        .input-container {
+            display: flex;
+            flex: 1;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 12px; /* Increased padding */
+            border: 1px solid #444; /* Darker border */
+            border-radius: 20px 0 0 20px; /* Rounded corners with rounded left side */
+            font-size: 1.2em; /* Larger font size */
+            margin-right: 0; /* No margin to align button */
+            background: #333; /* Dark background */
+            color: #fff; /* White text color */
+        }
+        
+        #sendButton {
+            background: #00723F; /* Dark green background */
+            color: white;
+            border: none;
+            padding: 12px 20px; /* Increased padding */
+            border-radius: 0 20px 20px 0; /* Rounded corners with rounded right side */
+            cursor: pointer;
+            font-size: 1.2em; /* Larger font size */
+        }
+        
+        #sendButton:hover {
+            background: #005d30; /* Darker green on hover */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>My Chat App</h1>
+    </nav>
+    <div class="chat-container">
+        <aside class="chat-sidebar">
+            <h2>Chats</h2>
+            <ul id="chatList">
+                <!-- List of historic chats will be dynamically inserted here -->
+            </ul>
+        </aside>
+        <div class="chat-main-container">
+            <main class="chat-main">
+                <div class="messages">
+                    <!-- Messages will be dynamically inserted here -->
+                </div>
+            </main>
+            <footer class="chat-footer">
+                <div class="input-container">
+                    <input type="text" id="messageInput" placeholder="Type your message...">
+                    <button id="sendButton">Send</button>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script>
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (message) {
+                // Add message to chat
+                const messageContainer = document.createElement('div');
+                messageContainer.classList.add('message', 'user');
+                messageContainer.textContent = message;
+
+                const messages = document.querySelector('.messages');
+                messages.appendChild(messageContainer);
+                input.value = '';
+                messages.scrollTop = messages.scrollHeight;
+
+                // Add chat history to sidebar
+                const chatList = document.getElementById('chatList');
+                const chatItem = document.createElement('li');
+                chatItem.textContent = `Chat ${chatList.children.length + 1}`;
+                chatItem.addEventListener('click', () => {
+                    // Load chat history on click (optional)
+                    console.log(`Loading chat ${chatItem.textContent}`);
+                });
+                chatList.appendChild(chatItem);
+
+                // Simulate a bot response
+                setTimeout(() => {
+                    const botMessage = document.createElement('div');
+                    botMessage.classList.add('message', 'bot');
+                    botMessage.textContent = 'This is a response from the bot.';
+                    messages.appendChild(botMessage);
+                    messages.scrollTop = messages.scrollHeight;
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

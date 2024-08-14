@@ -1,0 +1,56 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #0B0C0D; /* Dark background color */
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+    color: #ffffff; /* Green color for headings */
+  }
+
+  form {
+    background-color: white;
+    padding: 30px; /* Increased padding */
+    border-radius: 10px; /* More rounded corners */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Slightly larger shadow */
+    width: 400px; /* Fixed width for the form */
+  }
+
+  label {
+    display: block;
+    margin: 15px 0 5px;
+    color: #0B0C0D; /* Dark color for text */
+  }
+
+  input {
+    width: calc(100% - 20px); /* Adjust width to account for padding */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  button {
+    padding: 12px 25px; /* Larger button */
+    background-color: #00723F; /* Green button color */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #005b32; /* Darker green on hover */
+  }
