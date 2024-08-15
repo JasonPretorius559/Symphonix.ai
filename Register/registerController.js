@@ -1,42 +1,38 @@
 const bcrypt = require('bcrypt');
-const connection = require('../db'); // Import the database connection
+const connection = require('../db'); // Ensure this path is correct
+
 
 // Handle user registration
-const registerUser = (req, res) => {
+const registerUser = async (req, res) => {
   const { username, password } = req.body;
 
-  // Check if username and password are provided
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required.' });
   }
 
-  // Check if the username already exists
   const checkUserQuery = 'SELECT * FROM users WHERE username = ?';
-  connection.query(checkUserQuery, [username], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error checking username' });
-    }
+  const insertUserQuery = 'INSERT INTO users (username, password) VALUES (?, ?)';
 
-    if (results.length > 0) {
+  try {
+    // Check if the username already exists
+    const [existingUserResults] = await connection.query(checkUserQuery, [username]);
+
+    if (existingUserResults.length > 0) {
       return res.status(400).json({ error: 'Username already exists.' });
     }
 
     // Hash the password
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error hashing password' });
-      }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Insert user into the database
-      const insertUserQuery = 'INSERT INTO users (username, password) VALUES (?, ?)';
-      connection.query(insertUserQuery, [username, hashedPassword], (err, results) => {
-        if (err) {
-          return res.status(500).json({ error: 'Error registering user' });
-        }
-        res.status(201).json({ message: 'User registered successfully' });
-      });
-    });
-  });
+    // Insert the new user into the database
+    await connection.query(insertUserQuery, [username, hashedPassword]);
+
+    return res.status(201).json({ message: 'User registered successfully' });
+  } catch (err) {
+    console.error('Error during user registration:', err); // Log the error
+    return res.status(500).json({ error: 'Error registering user' });
+  }
 };
 
+// Export the function
 module.exports = { registerUser };

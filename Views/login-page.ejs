@@ -3,31 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register</title>
-  <link rel="stylesheet" href="/register-styling.css">
+  <title>Login</title>
+  <link rel="stylesheet" href="/login-page-styling.css">
 </head>
 <body>
-  
   <div class="container">
-    <h1>Register</h1>
-    <form id="registerForm">
+    <h1>Login</h1>
+    <form id="loginForm">
       <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required><br>
+      <input type="text" id="username" name="username" required>
+
       <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required><br>
-      <button type="submit">Register</button>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Login</button>
     </form>
-    <p><a href="/" id="already-have-account">Already have an account? Login here</a></p>
+    <p><a href="/register" id="no-account">Don't have an account? Register here</a></p>
   </div>
 
   <!-- Popup HTML -->
   <div id="popup" class="popup">
     <div class="popup-content">
       <span id="popup-close" class="popup-close">&times;</span>
-      <p id="popup-message"></p>
+      <p id="popup-message">Invalid credentials. Please try again.</p>
       <button id="popup-ok" class="popup-ok">Okay</button>
     </div>
   </div>
-  <script src="/javascript/register-page-javascript.js"></script>
+
+  <script src="/javascript/login-page-javascript.js"></script>
 </body>
 </html>
