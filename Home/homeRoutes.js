@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getChats, getMessages } = require('./homeController'); // Adjust the path as necessary
+const { getChats, getMessages, sendMessage } = require('./homeController'); // Adjust the path as necessary
 
 // Get chats
 router.get('/', async (req, res) => {
@@ -37,5 +37,8 @@ router.get('/messages/:chatId', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+router.post('/send-message', sendMessage);
+
 
 module.exports = router;
