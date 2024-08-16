@@ -1,4 +1,4 @@
-/* home-page-styling.css */
+/* Existing styles remain the same */
 
 body {
     margin: 0;
@@ -35,6 +35,7 @@ body {
     text-align: center;
     flex: 1; /* This will center the title */
 }
+
 .chat-container {
     display: flex;
     flex: 1;
@@ -88,6 +89,10 @@ body {
     margin-bottom: 10px;
     cursor: pointer;
     border-radius: 5px;
+    position: relative; /* Required for positioning the delete button */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .chat-item:hover {
@@ -215,11 +220,7 @@ body {
     }
 
     .chat-item {
-        flex: 0 0 auto;
-        width: auto;
-        padding: 10px 15px;
-        margin: 0 10px;
-        white-space: nowrap;
+        padding: 10px 40px 10px 10px; /* Adjust padding for delete button */
     }
 
     .chat-main-container {
@@ -249,4 +250,22 @@ body {
 .chat-sidebar #chatList {
     scrollbar-width: thin; /* Make the scrollbar thinner */
     scrollbar-color: #01713F #2c2c2c; /* Set scrollbar thumb and track color */
+}
+
+.delete-chat {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.delete-chat:hover {
+    background-color: #c0392b;
 }

@@ -19,7 +19,8 @@
                 <% if (chats && chats.length > 0) { %>
                     <% chats.forEach(chat => { %>
                         <li data-chat-id="<%= chat.id %>" class="chat-item">
-                            <%= chat.name %>
+                            <span><%= chat.name %></span>
+                            <button class="delete-chat" data-chat-id="<%= chat.id %>">Delete</button>
                         </li>
                     <% }); %>
                 <% } else { %>
