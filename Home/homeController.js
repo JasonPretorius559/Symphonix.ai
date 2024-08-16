@@ -31,8 +31,8 @@ const sendMessage = async (req, res) => {
     const userId = req.session.user?.id;
     const defaultName = 'Default Chat';
 
-    if (!chatId || !message) {
-        return res.status(400).json({ success: false, error: 'Chat ID and message are required' });
+    if (!message) {
+        return res.status(400).json({ success: false, error: 'Message is required' });
     }
 
     if (!userId) {
@@ -40,19 +40,27 @@ const sendMessage = async (req, res) => {
     }
 
     try {
+        let newChatId = chatId;
+
+        if (!chatId) {
+            // Create a new chat
+            const [result] = await connection.execute(
+                'INSERT INTO chats (userid, name, created_at) VALUES (?, ?, NOW())',
+                [userId, defaultName]
+            );
+            newChatId = result.insertId;
+        }
+
         // Insert user message into the database
         await connection.execute(
             'INSERT INTO messages (chat_id, userid, user_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
-            [chatId, userId, message, defaultName]
+            [newChatId, userId, message, defaultName]
         );
 
         // Send the message to the AI and get the response
         const aiResponse = await axios.post('http://localhost:5000/chat', { message: message });
 
-        const aiMessage = aiResponse.data.reply || null; // Adjusted to match AI response format
-
-        console.log('AI Response:', aiResponse.data); // Log entire AI response for debugging
-        console.log('AI Message:', aiMessage); // Log the specific AI message
+        const aiMessage = aiResponse.data.reply || null;
 
         if (!aiMessage) {
             console.error('AI Response is empty');
@@ -61,16 +69,16 @@ const sendMessage = async (req, res) => {
         // Insert AI response into the database
         await connection.execute(
             'INSERT INTO messages (chat_id, userid, ai_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
-            [chatId, null, aiMessage, defaultName]
+            [newChatId, null, aiMessage, defaultName]
         );
 
-        res.json({ success: true, aiMessage: aiMessage });
+        res.json({ success: true, aiMessage: aiMessage, chatId: newChatId });
     } catch (error) {
         console.error('Error sending message:', error.message);
-        console.error('Stack trace:', error.stack);
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 
 

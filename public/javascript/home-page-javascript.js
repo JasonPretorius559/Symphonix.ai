@@ -19,20 +19,109 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // sendButton.addEventListener('click', async () => {
+    //     const messageText = messageInput.value.trim();
+    //     if (messageText) {
+    //         // Get the currently selected chat ID or set to null if no chat is selected
+    //         const chatId = document.querySelector('.chat-item.active')?.getAttribute('data-chat-id') || null;
+    //         console.log('Selected Chat ID:', chatId); // Debugging line
+    
+    //         try {
+    //             // Send message to the backend
+    //             const response = await fetch('/home/send-message', {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify({ chatId, message: messageText })
+    //             });
+    
+    //             const result = await response.json();
+    
+    //             if (result.success) {
+    //                 if (result.chatId) {
+    //                     // Update or add the new chat item if a new chat was created
+    //                     let chatItem = document.querySelector(`.chat-item[data-chat-id="${result.chatId}"]`);
+    
+    //                     if (!chatItem) {
+    //                         // Create a new chat item if it doesn't exist
+    //                         chatItem = document.createElement('div');
+    //                         chatItem.classList.add('chat-item');
+    //                         chatItem.setAttribute('data-chat-id', result.chatId);
+    //                         chatItem.textContent = `Chat ${result.chatId}`; // Customize as needed
+    //                         chatList.appendChild(chatItem);
+    //                     }
+    
+    //                     // Activate the new or existing chat
+    //                     document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+    //                     chatItem.classList.add('active');
+    //                     loadMessages(result.chatId); // Load messages for the new or updated chat
+    //                 }
+    
+    //                 messageInput.value = ''; // Clear the input field
+                    
+    //             } else {
+    //                 // Handle errors without alerting the user
+    //                 console.error(result.error);
+    //             }
+    //         } catch (error) {
+    //             // Handle unexpected errors without alerting the user
+    //             console.error('An unexpected error occurred:', error.message);
+    //         }
+    //     } else {
+    //         // Handle empty message case if needed
+    //         console.warn('Message cannot be empty.');
+    //     }
+    // });
+
     sendButton.addEventListener('click', async () => {
         const messageText = messageInput.value.trim();
         if (messageText) {
-            const chatId = document.querySelector('.chat-item.active')?.getAttribute('data-chat-id');
+            const chatId = document.querySelector('.chat-item.active')?.getAttribute('data-chat-id') || null;
             console.log('Selected Chat ID:', chatId); // Debugging line
-            if (chatId) {
-                await sendMessage(chatId, messageText);
-                messageInput.value = '';
-            } else {
-                alert('Please select a chat.');
+    
+            try {
+                const response = await fetch('/home/send-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chatId, message: messageText })
+                });
+    
+                const result = await response.json();
+    
+                if (result.success) {
+                    if (result.chatId) {
+                        let chatItem = document.querySelector(`.chat-item[data-chat-id="${result.chatId}"]`);
+    
+                        if (!chatItem) {
+                            const chatList = document.getElementById('chatList');
+                            chatItem = document.createElement('div');
+                            chatItem.classList.add('chat-item');
+                            chatItem.setAttribute('data-chat-id', result.chatId);
+                            chatItem.textContent = result.chatName || 'Default Chat'; // Use the chat name from the result
+                            chatList.appendChild(chatItem);
+                        }
+    
+                        document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+                        chatItem.classList.add('active');
+                        loadMessages(result.chatId); // Load messages for the new or updated chat
+                    }
+    
+                    messageInput.value = ''; // Clear the input field
+                    
+                } else {
+                    console.error(result.error);
+                }
+            } catch (error) {
+                console.error('An unexpected error occurred:', error.message);
             }
+        } else {
+            console.warn('Message cannot be empty.');
         }
     });
-
+    
     async function loadMessages(chatId) {
         try {
             const response = await fetch(`/home/messages/${chatId}`);
@@ -59,38 +148,4 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error loading messages:', error.message);
         }
     }
-
-    async function sendMessage(chatId, messageText) {
-        try {
-            const response = await fetch('/home/send-message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    chatId: chatId,
-                    message: messageText
-                })
-            });
-    
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-    
-            const result = await response.json();
-            if (result.success) {
-                console.log('Message sent successfully');
-                // Optionally, reload messages or update the UI as needed
-                loadMessages(chatId); // Refresh messages after sending
-            } else {
-                console.error('Error sending message:', result.error);
-            }
-        } catch (error) {
-            console.error('Error sending message:', error.message);
-        }
-    }
-    
-    
-    
-
 });
