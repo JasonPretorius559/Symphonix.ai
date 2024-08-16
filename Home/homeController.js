@@ -1,57 +1,31 @@
-const connection= require('../db'); // Adjust the path as necessary
+const connection = require('../db'); // Import the database connection
+const axios = require('axios');
 
-// Function to fetch chats for a specific user
-async function getHomePageData(userId) {
+// Fetch all chats for a given user
+const getChats = async (userId) => {
     try {
-        const [rows] = await connection.query(
-            'SELECT id, name FROM Chats WHERE userid = ?',
-            [userId]
-        );
-        return rows; // Return the list of chats
+        if (!userId) {
+            throw new Error("User ID is not defined");
+        }
+        const [chats] = await connection.execute('SELECT * FROM chats WHERE userid = ?', [userId]);
+        return chats;
     } catch (error) {
-        console.error('Error fetching chats:', error);
+        console.error("Error fetching chats:", error.message);
         throw error;
     }
-}
-
-// Function to fetch messages for a specific chat
-async function getChatMessages(chatId) {
-    try {
-        const [rows] = await connection.query(
-            'SELECT message_id, user_message, ai_message, timestamp FROM Messages WHERE chat_id = ? ORDER BY timestamp ASC',
-            [chatId]
-        );
-        return rows; // Return the list of messages
-    } catch (error) {
-        console.error('Error fetching messages:', error);
-        throw error;
-    }
-}
-
-// Function to create a new chat
-async function createNewChat(userId, chatName) {
-    try {
-        const [result] = await connection.query(
-            'INSERT INTO Chats (userid, name) VALUES (?, ?)',
-            [userId, chatName]
-        );
-
-        const newChatId = result.insertId;
-
-        const [newChat] = await connection.query(
-            'SELECT id, name FROM Chats WHERE id = ?',
-            [newChatId]
-        );
-
-        return newChat[0]; // Return the new chat details
-    } catch (error) {
-        console.error('Error creating new chat:', error);
-        throw error;
-    }
-}
-
-module.exports = {
-    getHomePageData,
-    getChatMessages,
-    createNewChat
 };
+
+const getMessages = async (chatId) => {
+    try {
+        const [messages] = await connection.execute('SELECT * FROM messages WHERE chat_id = ?', [chatId]);
+        console.log('Fetched messages:', messages); // Debugging line
+        return messages;
+    } catch (error) {
+        console.error("Error fetching messages:", error.message);
+        throw error;
+    }
+};
+
+
+
+module.exports = { getChats, getMessages};

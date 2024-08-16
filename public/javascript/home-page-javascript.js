@@ -1,74 +1,59 @@
 document.addEventListener('DOMContentLoaded', () => {
     const chatList = document.getElementById('chatList');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
     const messagesContainer = document.querySelector('.messages');
-    const newChatButton = document.getElementById('newChatButton');
 
-    // Event listener to handle chat selection
+    // Load messages when a chat is clicked
     chatList.addEventListener('click', async (event) => {
-        const chatItem = event.target.closest('.chat-item');
-        if (chatItem) {
-            const chatId = chatItem.getAttribute('data-chat-id');
-            try {
-                const response = await fetch(`/home/chat/${chatId}/messages`);
-                const messages = await response.json();
-                renderMessages(messages);
-            } catch (error) {
-                console.error('Error fetching messages:', error);
-            }
+        if (event.target && event.target.classList.contains('chat-item')) {
+            const chatId = event.target.getAttribute('data-chat-id');
+            loadMessages(chatId);
         }
     });
 
-    // Event listener to handle the creation of a new chat
-    newChatButton.addEventListener('click', async () => {
-        try {
-            // Clear the chat pane
-            messagesContainer.innerHTML = '';
-
-            const response = await fetch('/home/chat/new', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name: 'New Chat' }) // Customize the chat name as needed
-            });
-
-            if (response.ok) {
-                const newChat = await response.json();
-                addChatToList(newChat);
+    // Send a message
+    sendButton.addEventListener('click', async () => {
+        const messageText = messageInput.value.trim();
+        if (messageText) {
+            const chatId = document.querySelector('.chat-item.active')?.getAttribute('data-chat-id');
+            if (chatId) {
+                await sendMessage(chatId, messageText);
+                messageInput.value = '';
             } else {
-                console.error('Failed to create new chat');
+                alert('Please select a chat.');
             }
-        } catch (error) {
-            console.error('Error creating new chat:', error);
         }
     });
 
-    // Function to render messages in the chat pane
-    function renderMessages(messages) {
-        messagesContainer.innerHTML = ''; // Clear previous messages
-        messages.forEach(msg => {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-
-            // Apply the correct class based on whether the message is from the user or AI
-            if (msg.user_message) {
-                messageElement.classList.add('user');
-                messageElement.textContent = msg.user_message;
-            } else if (msg.ai_message) {
-                messageElement.classList.add('bot');
-                messageElement.textContent = msg.ai_message;
-            }
-
-            messagesContainer.appendChild(messageElement);
-        });
+    async function loadMessages(chatId) {
+        try {
+            const response = await fetch(`/home/messages/${chatId}`);
+            const messages = await response.json();
+            console.log('Fetched messages:', messages); // Debugging line
+    
+            messagesContainer.innerHTML = '';
+    
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+    
+                if (message.userid === 9 && message.user_message) { // User message
+                    messageElement.classList.add('user');
+                    messageElement.textContent = message.user_message;
+                } else if (message.ai_message) { // AI message
+                    messageElement.classList.add('bot');
+                    messageElement.textContent = message.ai_message;
+                }
+    
+                messagesContainer.appendChild(messageElement);
+            });
+        } catch (error) {
+            console.error('Error loading messages:', error.message);
+        }
     }
+    
+    
+    
 
-    // Function to add a new chat to the chat list
-    function addChatToList(chat) {
-        const chatItem = document.createElement('li');
-        chatItem.classList.add('chat-item');
-        chatItem.setAttribute('data-chat-id', chat.id);
-        chatItem.textContent = chat.name;
-        chatList.appendChild(chatItem);
-    }
 });
