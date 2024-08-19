@@ -1,8 +1,9 @@
-/* Existing styles remain the same */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
+/* Apply Rubik font to the entire page */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Rubik', sans-serif;
     background-color: #f4f4f4;
     height: 100vh;
     display: flex;
@@ -281,9 +282,10 @@ body {
     position: absolute;
     right: 0; /* Align dropdown to the right */
     top: 100%;
-    background-color: #ffffff;
+    background-color: #4CAF50;
     border-radius: 8px;
-    min-width: 160px;
+    width: 500px; /* Set width */
+    height: 500px; /* Set height */
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -299,12 +301,13 @@ body {
 }
 
 .dropdown-content a {
-    color: #333;
-    padding: 12px 16px; /* Adjust as needed */
+    color: white; /* Adjust text color to match the background */
+    padding: 12px 16px; /* Adjust padding as needed */
     text-decoration: none;
     display: block;
-    border-bottom: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border-bottom: 1px solid #4CAF50; /* Optional: border to separate items */
+    font-size: 25px;
+    font-family: 'Rubik', sans-serif; /* Apply the Rubik font */
 }
 
 .dropdown-content a:last-child {
@@ -312,7 +315,9 @@ body {
 }
 
 .dropdown-content a:hover {
-    background-color: #f1f1f1;
+    background-color: #005C3C;
+    border-radius: 8px;
+    transition: background-color 0.3s ease; /* Ease the background color transition */
 }
 
 .dropdown .dropbtn {
