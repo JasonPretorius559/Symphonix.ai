@@ -6,13 +6,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutOption = document.getElementById('logoutOption');
     const dropdownContent = document.querySelector('.dropdown-content');
     const dropdownButton = document.querySelector('.dropdown .dropbtn');
+    const newChatButton = document.getElementById('newChatButton'); // New Chat button
+
+    let currentChatId = null; // Variable to keep track of the current chat ID
+    let isSending = false; // Flag to prevent multiple sends
+    let isCooldownActive = false; // Flag to prevent multiple new chat requests
 
     chatList.addEventListener('click', (event) => {
         if (event.target && event.target.classList.contains('chat-item')) {
-            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+            const activeChat = document.querySelector('.chat-item.active');
+            if (activeChat) {
+                activeChat.classList.remove('active');
+            }
             event.target.classList.add('active');
-            const chatId = event.target.getAttribute('data-chat-id');
-            loadMessages(chatId);
+            currentChatId = event.target.getAttribute('data-chat-id');
+            loadMessages(currentChatId);
         } else if (event.target && event.target.classList.contains('delete-chat')) {
             const chatItem = event.target.closest('.chat-item');
             const chatId = chatItem.getAttribute('data-chat-id');
@@ -21,16 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     sendButton.addEventListener('click', async () => {
+        if (isSending) return; // Prevent multiple sends
+
+        isSending = true; // Set flag to true
         const messageText = messageInput.value.trim();
         if (messageText) {
-            const chatId = document.querySelector('.chat-item.active')?.getAttribute('data-chat-id') || null;
             try {
                 const response = await fetch('/home/send-message', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ chatId, message: messageText })
+                    body: JSON.stringify({ chatId: currentChatId, message: messageText })
                 });
 
                 const result = await response.json();
@@ -40,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         let chatItem = document.querySelector(`.chat-item[data-chat-id="${result.chatId}"]`);
 
                         if (!chatItem) {
-                            const chatList = document.getElementById('chatList');
                             chatItem = document.createElement('div');
                             chatItem.classList.add('chat-item');
                             chatItem.setAttribute('data-chat-id', result.chatId);
@@ -57,21 +66,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             chatList.appendChild(chatItem);
                         }
 
-                        document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
                         chatItem.classList.add('active');
-                        loadMessages(result.chatId);
+                        currentChatId = result.chatId;
+                        loadMessages(currentChatId);
                     }
 
-                    messageInput.value = '';
-                    
+                    messageInput.value = ''; // Clear the input field
+
                 } else {
                     console.error(result.error);
                 }
             } catch (error) {
                 console.error('An unexpected error occurred:', error.message);
+            } finally {
+                isSending = false; // Reset flag after handling the request
             }
         } else {
             console.warn('Message cannot be empty.');
+            isSending = false; // Reset flag if no message to send
         }
     });
 
@@ -115,7 +127,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 chatItem.remove();
                 messagesContainer.innerHTML = '';
-                document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+                const activeChat = document.querySelector('.chat-item.active');
+                if (activeChat && activeChat.getAttribute('data-chat-id') === chatId) {
+                    currentChatId = null; // Clear current chat ID if it's the one being deleted
+                }
+                if (activeChat) {
+                    activeChat.classList.remove('active');
+                }
             } else {
                 console.error(result.error);
             }
@@ -123,6 +141,28 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('An unexpected error occurred:', error.message);
         }
     }
+
+    // Handle New Chat Button Click
+    newChatButton.addEventListener('click', () => {
+        if (isCooldownActive) return; // Prevent multiple new chat requests
+
+        isCooldownActive = true; // Set cooldown flag
+        console.log('New Chat button clicked');
+        // Clear active chat
+        const activeChat = document.querySelector('.chat-item.active');
+        if (activeChat) {
+            activeChat.classList.remove('active');
+        }
+        messagesContainer.innerHTML = ''; // Clear messages
+        messageInput.value = ''; // Clear input
+        currentChatId = null; // Set chat ID to null
+        console.log('Current chat ID cleared:', currentChatId);
+
+        // Reset cooldown after 1 second
+        setTimeout(() => {
+            isCooldownActive = false;
+        }, 1000);
+    });
 
     // Toggle dropdown visibility
     dropdownButton.addEventListener('click', () => {
@@ -159,5 +199,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
 });
