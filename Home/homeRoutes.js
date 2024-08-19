@@ -30,14 +30,13 @@ router.get('/messages/:chatId', async (req, res) => {
             return res.status(400).send("User ID not found in session");
         }
 
-        const messages = await getMessages(chatId, userId); // Ensure this function only fetches messages belonging to the user
+        const messages = await getMessages(chatId, userId); // Ensure this function fetches messages for the user
         res.json(messages);
     } catch (error) {
         console.error("Error fetching messages:", error.message);
         res.status(500).send('Internal Server Error');
     }
 });
-
 router.post('/send-message', sendMessage);
 
 router.post('/delete-chat', deleteChat);

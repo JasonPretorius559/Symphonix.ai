@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message');
 
-                if (message.userid === 9 && message.user_message) {
+                if (message.userid && message.user_message) {
                     messageElement.classList.add('user');
                     messageElement.textContent = message.user_message;
                 } else if (message.ai_message) {
