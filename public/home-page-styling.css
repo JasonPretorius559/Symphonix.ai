@@ -269,3 +269,63 @@ body {
 .delete-chat:hover {
     background-color: #c0392b;
 }
+
+/* Add CSS for dropdown menu */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0; /* Align dropdown to the right */
+    top: 100%;
+    background-color: #ffffff;
+    border-radius: 8px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    padding: 0; /* Remove padding to avoid extra space */
+    margin: 0; /* Ensure no extra margin */
+}
+
+.dropdown-content.show {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    margin-top: 16px; /* Ensure there's space between dropdown and the button */
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px; /* Adjust as needed */
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.dropdown-content a:last-child {
+    border-bottom: none; /* Remove border from last item */
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown .dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.dropdown img {
+    width: 40px; /* Adjust the size of the image */
+    height: 40px; /* Adjust the size of the image */
+    border-radius: 50%;
+    border: 2px solid #fff; /* Add a border to the image for better visibility */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for a lifted effect */
+}
