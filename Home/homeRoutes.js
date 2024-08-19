@@ -58,5 +58,20 @@ router.post('/logout', (req, res) => {
     }
 });
 
+router.get('/user-info', (req, res) => {
+    try {
+        const user = req.session.user;
+        
+        if (!user) {
+            return res.status(401).json({ success: false, error: 'User not authenticated' });
+        }
+
+        res.json({ success: true, user: { username: user.username, id: user.id } });
+    } catch (error) {
+        console.error('Error in user-info route:', error.message);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+})
+
 
 module.exports = router;

@@ -8,17 +8,19 @@
 </head>
 <body>
     <nav class="navbar">
-        <img src="/image-data/flm-white-logo.png" alt="Logo" class="logo">
+        <!-- <img src="/image-data/flm-white-logo.png" alt="Logo" class="logo"> -->
         <h1>Symphonix.ai</h1>
         <div class="dropdown">
             <button class="dropbtn">
-                <img src="/image-data/flm-green-logo.png" alt="Logout">
+                <img src="/image-data/flm-green-logo.png" alt="User Info">
             </button>
             <div class="dropdown-content">
+                <div id="userInfo">
+                    <!-- User info will be injected here -->
+                </div>
                 <a href="#" id="logoutOption">Logout</a>
             </div>
         </div>
-
     </nav>
     <div class="chat-container">
         <aside class="chat-sidebar">
@@ -47,10 +49,15 @@
                 <div class="input-container">
                     <input type="text" id="messageInput" placeholder="Type your message...">
                     <button id="sendButton">Send</button>
+                    <div id="sendSpinner" style="display:none;">
+                        <!-- Spinner icon here, e.g., a CSS animated spinner or a FontAwesome spinner icon -->
+                        <i class="fa fa-spinner fa-spin"></i>
+                    </div>
                 </div>
             </footer>
         </div>
     </div>
     <script src="/javascript/home-page-javascript.js"></script>
+    <script src="/javascript/user-info.js"></script>
 </body>
 </html>

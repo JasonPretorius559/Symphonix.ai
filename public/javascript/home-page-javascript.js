@@ -2,90 +2,162 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatList = document.getElementById('chatList');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
+    const spinner = document.createElement('div'); // Create spinner element
+    spinner.classList.add('spinner'); // Add spinner class
     const messagesContainer = document.querySelector('.messages');
     const logoutOption = document.getElementById('logoutOption');
     const dropdownContent = document.querySelector('.dropdown-content');
     const dropdownButton = document.querySelector('.dropdown .dropbtn');
-    const newChatButton = document.getElementById('newChatButton'); // New Chat button
+    const newChatButton = document.getElementById('newChatButton');
 
-    let currentChatId = null; // Variable to keep track of the current chat ID
-    let isSending = false; // Flag to prevent multiple sends
-    let isCooldownActive = false; // Flag to prevent multiple new chat requests
+    let currentChatId = null; 
+    let isSending = false; 
+    let isCooldownActive = false; 
 
     chatList.addEventListener('click', (event) => {
-        if (event.target && event.target.classList.contains('chat-item')) {
-            const activeChat = document.querySelector('.chat-item.active');
-            if (activeChat) {
-                activeChat.classList.remove('active');
-            }
-            event.target.classList.add('active');
-            currentChatId = event.target.getAttribute('data-chat-id');
-            loadMessages(currentChatId);
-        } else if (event.target && event.target.classList.contains('delete-chat')) {
-            const chatItem = event.target.closest('.chat-item');
-            const chatId = chatItem.getAttribute('data-chat-id');
-            deleteChat(chatId, chatItem);
+        if (event.target.classList.contains('chat-item')) {
+            handleChatItemClick(event.target);
+        } else if (event.target.classList.contains('delete-chat')) {
+            handleChatDelete(event.target.closest('.chat-item'));
         }
     });
 
     sendButton.addEventListener('click', async () => {
-        if (isSending) return; // Prevent multiple sends
+        if (isSending) return;
 
-        isSending = true; // Set flag to true
+        isSending = true;
+        sendButton.disabled = true;
+        sendButton.innerHTML = spinner.outerHTML;
+
         const messageText = messageInput.value.trim();
         if (messageText) {
             try {
-                const response = await fetch('/home/send-message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ chatId: currentChatId, message: messageText })
-                });
+                messageInput.value = '';
+                const response = await sendMessage(messageText);
 
-                const result = await response.json();
-
-                if (result.success) {
-                    if (result.chatId) {
-                        let chatItem = document.querySelector(`.chat-item[data-chat-id="${result.chatId}"]`);
-
-                        if (!chatItem) {
-                            chatItem = document.createElement('div');
-                            chatItem.classList.add('chat-item');
-                            chatItem.setAttribute('data-chat-id', result.chatId);
-
-                            const chatName = document.createElement('span');
-                            chatName.textContent = result.chatName || 'Default Chat';
-                            chatItem.appendChild(chatName);
-
-                            const deleteButton = document.createElement('button');
-                            deleteButton.classList.add('delete-chat');
-                            deleteButton.textContent = 'Delete';
-                            chatItem.appendChild(deleteButton);
-
-                            chatList.appendChild(chatItem);
-                        }
-
-                        chatItem.classList.add('active');
-                        currentChatId = result.chatId;
-                        loadMessages(currentChatId);
-                    }
-
-                    messageInput.value = ''; // Clear the input field
-
+                if (response.success && response.chatId) {
+                    handleChatResponse(response);
                 } else {
-                    console.error(result.error);
+                    console.error(response.error);
                 }
             } catch (error) {
                 console.error('An unexpected error occurred:', error.message);
             } finally {
-                isSending = false; // Reset flag after handling the request
+                resetSendButton();
             }
         } else {
             console.warn('Message cannot be empty.');
-            isSending = false; // Reset flag if no message to send
+            resetSendButton();
         }
     });
+
+    newChatButton.addEventListener('click', () => {
+        if (isCooldownActive) return;
+
+        isCooldownActive = true;
+        handleNewChat();
+        setTimeout(() => {
+            isCooldownActive = false;
+        }, 1000);
+    });
+
+    dropdownButton.addEventListener('click', () => {
+        toggleDropdown();
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.dropdown')) {
+            closeDropdown();
+        }
+    });
+
+    if (logoutOption) {
+        logoutOption.addEventListener('click', async (event) => {
+            event.preventDefault();
+            try {
+                const response = await fetch('/home/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Logout failed:', await response.text());
+                }
+            } catch (error) {
+                console.error('An unexpected error occurred:', error.message);
+            }
+        });
+    }
+
+    async function handleChatItemClick(chatItem) {
+        const activeChat = document.querySelector('.chat-item.active');
+        if (activeChat) {
+            activeChat.classList.remove('active');
+        }
+        chatItem.classList.add('active');
+        currentChatId = chatItem.getAttribute('data-chat-id');
+        await loadMessages(currentChatId);
+    }
+
+    async function handleChatDelete(chatItem) {
+        const chatId = chatItem.getAttribute('data-chat-id');
+        try {
+            const response = await fetch('/home/delete-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chatId })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                chatItem.remove();
+                messagesContainer.innerHTML = '';
+                if (currentChatId === chatId) {
+                    currentChatId = null;
+                }
+            } else {
+                console.error(result.error);
+            }
+        } catch (error) {
+            console.error('An unexpected error occurred:', error.message);
+        }
+    }
+
+    async function sendMessage(messageText) {
+        const response = await fetch('/home/send-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chatId: currentChatId, message: messageText })
+        });
+        return await response.json();
+    }
+
+    function handleChatResponse(response) {
+        let chatItem = document.querySelector(`.chat-item[data-chat-id="${response.chatId}"]`);
+
+        if (!chatItem) {
+            chatItem = document.createElement('div');
+            chatItem.classList.add('chat-item');
+            chatItem.setAttribute('data-chat-id', response.chatId);
+
+            const chatName = document.createElement('span');
+            chatName.textContent = response.chatName || 'Default Chat';
+            chatItem.appendChild(chatName);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('delete-chat');
+            deleteButton.textContent = 'Delete';
+            chatItem.appendChild(deleteButton);
+
+            chatList.appendChild(chatItem);
+        }
+
+        chatItem.classList.add('active');
+        currentChatId = response.chatId;
+        loadMessages(currentChatId);
+    }
 
     async function loadMessages(chatId) {
         try {
@@ -96,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
             messages.forEach(message => {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message');
-
                 if (message.userid && message.user_message) {
                     messageElement.classList.add('user');
                     messageElement.textContent = message.user_message;
@@ -104,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageElement.classList.add('bot');
                     messageElement.textContent = message.ai_message;
                 }
-
                 messagesContainer.appendChild(messageElement);
             });
         } catch (error) {
@@ -112,91 +182,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteChat(chatId, chatItem) {
-        try {
-            const response = await fetch('/home/delete-chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ chatId })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                chatItem.remove();
-                messagesContainer.innerHTML = '';
-                const activeChat = document.querySelector('.chat-item.active');
-                if (activeChat && activeChat.getAttribute('data-chat-id') === chatId) {
-                    currentChatId = null; // Clear current chat ID if it's the one being deleted
-                }
-                if (activeChat) {
-                    activeChat.classList.remove('active');
-                }
-            } else {
-                console.error(result.error);
-            }
-        } catch (error) {
-            console.error('An unexpected error occurred:', error.message);
-        }
+    function resetSendButton() {
+        isSending = false;
+        sendButton.disabled = false;
+        sendButton.innerHTML = 'Send';
     }
 
-    // Handle New Chat Button Click
-    newChatButton.addEventListener('click', () => {
-        if (isCooldownActive) return; // Prevent multiple new chat requests
-
-        isCooldownActive = true; // Set cooldown flag
-        console.log('New Chat button clicked');
-        // Clear active chat
+    function handleNewChat() {
         const activeChat = document.querySelector('.chat-item.active');
         if (activeChat) {
             activeChat.classList.remove('active');
         }
-        messagesContainer.innerHTML = ''; // Clear messages
-        messageInput.value = ''; // Clear input
-        currentChatId = null; // Set chat ID to null
-        console.log('Current chat ID cleared:', currentChatId);
+        messagesContainer.innerHTML = '';
+        messageInput.value = '';
+        currentChatId = null;
+    }
 
-        // Reset cooldown after 1 second
-        setTimeout(() => {
-            isCooldownActive = false;
-        }, 1000);
-    });
+    function toggleDropdown() {
+        dropdownContent.classList.toggle('show');
+    }
 
-    // Toggle dropdown visibility
-    dropdownButton.addEventListener('click', () => {
-        const isVisible = dropdownContent.classList.contains('show');
-        dropdownContent.classList.toggle('show', !isVisible);
-    });
-
-    // Click outside to close dropdown
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('.dropdown')) {
-            dropdownContent.classList.remove('show');
-        }
-    });
-
-    if (logoutOption) {
-        logoutOption.addEventListener('click', async (event) => {
-            event.preventDefault();
-            try {
-                const response = await fetch('/home/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    // Redirect to login page or home page
-                    window.location.href = '/'; // Adjust the URL as needed
-                } else {
-                    console.error('Logout failed:', await response.text());
-                }
-            } catch (error) {
-                console.error('An unexpected error occurred:', error.message);
-            }
-        });
+    function closeDropdown() {
+        dropdownContent.classList.remove('show');
     }
 });
