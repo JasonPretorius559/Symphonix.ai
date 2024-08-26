@@ -12,12 +12,15 @@ CORS(app)  # Enable CORS for all routes
 logging.basicConfig(level=logging.DEBUG)
 
 class AIModel:
-    def __init__(self, command):
+    """A class to manage an AI model interaction through a subprocess."""
+    
+    def __init__(self, command: str):
         self.command = command
         self.process = None
         self.lock = Lock()
 
     def start(self):
+        """Starts the AI model subprocess and waits for it to be ready."""
         if not self.process:
             logging.info("Starting AI model...")
             try:
@@ -28,7 +31,8 @@ class AIModel:
                 logging.error(f"Failed to start AI model: {e}")
                 self.process = None
 
-    def send_message(self, message):
+    def send_message(self, message: str) -> str:
+        """Sends a message to the AI model and ensures the complete message is captured before processing."""
         if not self.process:
             raise RuntimeError("AI model is not running")
 
@@ -36,18 +40,24 @@ class AIModel:
             try:
                 logging.debug(f"Sending message to AI model: {message}")
                 self.process.sendline(message)
-                self.process.expect('>>>')  # Wait for the prompt to return
+                
+                # Wait for the AI to complete its response
+                index = self.process.expect(['>>>', pexpect.EOF, pexpect.TIMEOUT])
 
-                response = self.process.before.strip()
-                cleaned_response = ResponseFormatter.format_response(response)
-                logging.debug(f"Received response: {cleaned_response}")
-                return cleaned_response
+                if index == 0:
+                    response = self.process.before.strip()
+                    logging.debug(f"Received response: {response}")
+                    return self.clean_and_format_text(response)
+                else:
+                    logging.error("Failed to receive complete response from AI model")
+                    return "Error: Incomplete response from AI model"
 
             except Exception as e:
                 logging.error(f"Exception occurred while communicating with the model: {e}")
                 raise RuntimeError(f"Error during communication with the AI model: {e}")
 
     def shutdown(self):
+        """Shuts down the AI model subprocess."""
         if self.process:
             logging.info("Shutting down AI model...")
             self.process.sendline('/bye')  # Send the termination command
@@ -56,71 +66,20 @@ class AIModel:
         else:
             logging.error("AI model is not running")
 
-class ResponseFormatter:
-    
     @staticmethod
-    def format_response(response):
-        """Clean and format the response, accommodating single lines, lists, and code blocks."""
-        # Remove unwanted initial text
-        response = re.sub(r'^Send a message \(/\? for help\)', '', response).strip()
-        
-        # Remove user's question if present in the response
-        response = re.sub(r'^(.*?)(?=\s*The Nissan 350Z|The Nissan 350Z)', '', response).strip()
-        
-        # Remove ANSI escape sequences and other control characters
-        response = re.sub(r'\x1B[@-_][0-?]*[ -/]*[@-~]', '', response)
-        response = re.sub(r'\x1B\[([0-9;]*)[A-Za-z]', '', response)
-        response = re.sub(r'[\u2800-\u28FF]', '', response)  # Remove Braille spinner characters
-        response = response.replace("*", "")
-        response = re.sub(r'\s+', ' ', response)  # Collapse multiple spaces into one
-        
-        # Remove exact word repetitions while avoiding cutting off words
-        response = re.sub(r'\b(\w+)( \1\b)+', r'\1', response)
-        
-        # Handle repeated phrases
-        response = re.sub(r'\b(\w+ \w+)( \1\b)+', r'\1', response)
-
-        # Remove partial word repetitions that occur due to processing errors
-        response = re.sub(r'\b(\w+)(\w{1,3}) \1', r'\1', response)
-
-        # Handle specific formatting
-        response = re.sub(r'([a-zA-Z])\s+([,.:;!?])', r'\1\2', response)  # Remove space before punctuation
-        response = re.sub(r'\(\s+', '(', response)  # Remove space after opening parenthesis
-        response = re.sub(r'\s+\)', ')', response)  # Remove space before closing parenthesis
-        response = re.sub(r'\s{2,}', ' ', response)  # Collapse multiple spaces again
-
-        # Split the response into lines for further handling
-        lines = response.splitlines()
-
-        # Process lines to ensure clean list formatting
-        formatted_lines = []
-        for line in lines:
-            if re.match(r'^\d+\.\s', line):  # Detect numbered lists
-                formatted_lines.append(line.strip())
-            elif re.match(r'^\s*-\s', line):  # Detect bullet points
-                formatted_lines.append(line.strip())
-            else:  # General text or code
-                formatted_lines.append(line.strip())
-
-        # Reassemble the cleaned and formatted lines
-        formatted_response = "\n".join(formatted_lines)
-
-        # Final cleaning of repeated phrases that span multiple lines
-        formatted_response = re.sub(r'\b(\w+ \w+)( \1\b)+', r'\1', formatted_response)
-
-        return formatted_response
-
-# Initialize the AI model
-ai_model = AIModel('/usr/local/bin/ollama run llama3')
+    def clean_and_format_text(text):
+        """Cleans text by removing duplicated words and normalizing whitespace."""
+        text = re.sub(r'\s+', ' ', text).strip()
+        text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text, flags=re.IGNORECASE)
+        return text
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    """Receives a message from the client, sends it to the AI, and returns the AI's response."""
     message = request.json.get('message')
     if not message:
         logging.error("No message provided")
         return jsonify({'error': 'No message provided'}), 400
-
-    logging.debug(f"Received message: {message}")
 
     try:
         response = ai_model.send_message(message)
@@ -130,6 +89,7 @@ def chat():
 
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
+    """Shuts down the AI model on request and returns the shutdown status."""
     try:
         ai_model.shutdown()
         return jsonify({'status': 'AI model has been shut down'})
@@ -138,6 +98,7 @@ def shutdown():
 
 @app.before_first_request
 def before_first_request():
+    """Start the AI model before the first request is handled."""
     ai_model.start()
 
 def graceful_shutdown(signal, frame):
@@ -151,5 +112,6 @@ signal.signal(signal.SIGINT, graceful_shutdown)
 signal.signal(signal.SIGTERM, graceful_shutdown)
 
 if __name__ == '__main__':
+    ai_model = AIModel('/usr/local/bin/ollama run llama3')
     ai_model.start()
     app.run(host='0.0.0.0', port=5000)

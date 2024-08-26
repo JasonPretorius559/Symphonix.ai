@@ -131,7 +131,8 @@ body {
     margin-bottom: 10px;
     border-radius: 10px;
     max-width: 60%;
-    word-wrap: break-word;
+    word-break: normal;        /* Only break at normal word breaks */
+    overflow-wrap: normal;     /* Prevent arbitrary word breaks */
 }
 
 .message.user {
