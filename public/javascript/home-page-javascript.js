@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSending = false; 
     let isCooldownActive = false; 
 
+    function cleanMessageText(text) {
+        const words = text.split(' ');
+        const cleanedWords = words.filter((value, index, self) => self.indexOf(value) === index);
+        return cleanedWords.join(' ');
+    }
+
     chatList.addEventListener('click', (event) => {
         if (event.target.classList.contains('chat-item')) {
             handleChatItemClick(event.target);
@@ -29,19 +35,35 @@ document.addEventListener('DOMContentLoaded', () => {
         sendButton.disabled = true;
         sendButton.innerHTML = spinner.outerHTML;
 
-        const messageText = messageInput.value.trim();
+        let messageText = messageInput.value.trim();
+        messageText = cleanMessageText(messageText); // Clean the message text before sending
         if (messageText) {
+            const userMessageElement = document.createElement('div');
+            userMessageElement.classList.add('message', 'user');
+            userMessageElement.textContent = messageText;
+            messagesContainer.appendChild(userMessageElement);
+
+            messageInput.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            const aiMessagePlaceholder = document.createElement('div');
+            aiMessagePlaceholder.classList.add('message', 'bot');
+            aiMessagePlaceholder.innerHTML = '<div class="spinner"></div>';
+            messagesContainer.appendChild(aiMessagePlaceholder);
+
             try {
-                messageInput.value = '';
                 const response = await sendMessage(messageText);
 
                 if (response.success && response.chatId) {
+                    aiMessagePlaceholder.textContent = cleanMessageText(response.aiMessage) || 'AI Response';
                     handleChatResponse(response);
                 } else {
                     console.error(response.error);
+                    aiMessagePlaceholder.textContent = 'Error: Could not retrieve AI response.';
                 }
             } catch (error) {
                 console.error('An unexpected error occurred:', error.message);
+                aiMessagePlaceholder.textContent = 'Error: Could not retrieve AI response.';
             } finally {
                 resetSendButton();
             }
@@ -170,10 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 messageElement.classList.add('message');
                 if (message.userid && message.user_message) {
                     messageElement.classList.add('user');
-                    messageElement.textContent = message.user_message;
+                    messageElement.textContent = cleanMessageText(message.user_message);
                 } else if (message.ai_message) {
                     messageElement.classList.add('bot');
-                    messageElement.textContent = message.ai_message;
+                    messageElement.textContent = cleanMessageText(message.ai_message);
                 }
                 messagesContainer.appendChild(messageElement);
             });
