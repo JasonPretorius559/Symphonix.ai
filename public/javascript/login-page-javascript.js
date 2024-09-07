@@ -4,9 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const popupMessage = document.getElementById('popup-message');
   const popupClose = document.getElementById('popup-close');
   const popupOk = document.getElementById('popup-ok');
+  const spinnerContainer = document.getElementById('spinner-container'); // Reference to spinner container
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault(); // Prevent default form submission
+
+    // Show the spinner when form submission starts
+    spinnerContainer.style.display = 'flex'; // Show the spinner container
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
@@ -39,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       popupMessage.textContent = 'An error occurred: ' + error.message;
       popup.style.display = 'block';
+    } finally {
+      // Hide the spinner once the response is received
+      spinnerContainer.style.display = 'none'; // Hide the spinner container
     }
   });
 

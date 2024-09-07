@@ -9,7 +9,7 @@ const loginUser = async (req, res) => {
     return res.status(400).json({ error: 'Username and password are required.' });
   }
 
-  const query = 'SELECT userid, username, password FROM users WHERE username = ?';
+  const query = 'SELECT userid, username, password, disabled_status FROM users WHERE username = ?';
 
   try {
     // Execute the query using promise-based connection
@@ -20,6 +20,11 @@ const loginUser = async (req, res) => {
     }
 
     const user = results[0];
+
+    // Check if the account is disabled
+    if (user.disabled_status === 1) {
+      return res.status(403).json({ error: 'Account is disabled. Please contact support.' });
+    }
 
     // Compare the password
     const isMatch = await bcrypt.compare(password, user.password);
@@ -37,6 +42,7 @@ const loginUser = async (req, res) => {
     return res.status(500).json({ error: 'Error processing request' });
   }
 };
+
 
 // Export the function
 module.exports = { loginUser };

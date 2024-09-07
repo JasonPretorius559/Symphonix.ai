@@ -80,56 +80,52 @@ const sendMessage = async (req, res) => {
     } catch (error) {
         console.error('Error sending message:', error.message);
         res.status(500).json({ success: false, error: error.message });
-
     }
-    const deleteChat = async (req, res) => {
-        const { chatId } = req.body;
-        const userId = req.session.user?.id;
-    
-        if (!chatId) {
-            return res.status(400).json({ success: false, error: 'Chat ID is required' });
+};
+
+const deleteChat = async (req, res) => {
+    const { chatId } = req.body;
+    const userId = req.session.user?.id;
+
+    if (!chatId) {
+        return res.status(400).json({ success: false, error: 'Chat ID is required' });
+    }
+
+    if (!userId) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+    }
+
+    const conn = await connection.getConnection();
+    try {
+        await conn.beginTransaction();
+
+        // Mark related messages as deleted
+        await conn.query('UPDATE messages SET deleted = 1 WHERE chat_id = ?', [chatId]);
+
+        // Mark the chat as deleted
+        const [result] = await conn.query('UPDATE chats SET deleted = 1 WHERE id = ? AND userid = ?', [chatId, userId]);
+
+        if (result.affectedRows === 0) {
+            // If no rows were affected, the chat might not exist or the user might not own it
+            await conn.rollback();
+            return res.status(404).json({ success: false, error: 'Chat not found or not authorized to delete' });
         }
-    
-        if (!userId) {
-            return res.status(401).json({ success: false, error: 'User not authenticated' });
-        }
-    
-        const conn = await connection.getConnection();
+
+        // Commit the transaction
+        await conn.commit();
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting chat:', error.message);
+        // Rollback the transaction in case of error
         try {
-            await conn.beginTransaction();
-    
-            // Mark related messages as deleted
-            await conn.query('UPDATE messages SET deleted = 1 WHERE chat_id = ?', [chatId]);
-    
-            // Mark the chat as deleted
-            const [result] = await conn.query('UPDATE chats SET deleted = 1 WHERE id = ? AND userid = ?', [chatId, userId]);
-    
-            if (result.affectedRows === 0) {
-                // If no rows were affected, the chat might not exist or the user might not own it
-                await conn.rollback();
-                return res.status(404).json({ success: false, error: 'Chat not found or not authorized to delete' });
-            }
-    
-            // Commit the transaction
-            await conn.commit();
-            res.json({ success: true });
-        } catch (error) {
-            console.error('Error deleting chat:', error.message);
-            // Rollback the transaction in case of error
-            try {
-                await conn.rollback();
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError.message);
-            }
-            res.status(500).json({ success: false, error: error.message });
-        } finally {
-            conn.release();
+            await conn.rollback();
+        } catch (rollbackError) {
+            console.error('Error rolling back transaction:', rollbackError.message);
         }
-    };
+        res.status(500).json({ success: false, error: error.message });
+    } finally {
+        conn.release();
+    }
+};
 
-
-}
-
-
-
-module.exports = { getChats, getMessages, sendMessage, deleteChat};
+module.exports = { getChats, getMessages, sendMessage, deleteChat };
