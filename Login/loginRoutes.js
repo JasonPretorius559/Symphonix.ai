@@ -8,7 +8,9 @@ router.get('/', (req, res) => {
   res.render('login-page');
 });
 
-// Handle login form submission
-router.post('/login', loginUser);
+router.post('/login', (req, res, next) => {
+  // Call the loginUser function immediately
+  loginUser(req, res, next);
+});
 
 module.exports = router;

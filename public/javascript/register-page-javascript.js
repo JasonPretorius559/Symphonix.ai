@@ -4,9 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const popupMessage = document.getElementById('popup-message');
   const popupClose = document.getElementById('popup-close');
   const popupOk = document.getElementById('popup-ok');
+  const spinnerContainer = document.getElementById('spinner-container');
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault(); // Prevent default form submission
+
+    // Show spinner
+    spinnerContainer.style.display = 'block';
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
@@ -30,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('Unexpected response format');
       }
 
+      // Hide spinner once the response is received
+      spinnerContainer.style.display = 'none';
+
       if (response.ok) {
         popupMessage.textContent = 'Registration successful!';
         form.reset(); // Optionally reset the form
@@ -39,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.style.display = 'block';
       }
     } catch (error) {
+      spinnerContainer.style.display = 'none'; // Hide spinner on error
       popupMessage.textContent = 'An error occurred: ' + error.message;
       popup.style.display = 'block';
     }
