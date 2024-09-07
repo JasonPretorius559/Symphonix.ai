@@ -140,3 +140,31 @@ body {
 #already-have-account:hover {
   text-decoration: underline; /* Add underline on hover */
 }
+
+
+#spinner-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  display: none; /* Hidden by default */
+}
+
+#spinner {
+  border: 12px solid rgba(0, 0, 0, 0.1); /* Light border */
+  border-top: 12px solid #00723F; /* Green border */
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

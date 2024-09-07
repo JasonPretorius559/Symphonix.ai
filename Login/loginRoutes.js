@@ -8,16 +8,9 @@ router.get('/', (req, res) => {
   res.render('login-page');
 });
 
-// Handle login form submission with delay
 router.post('/login', (req, res, next) => {
-  const delay = 5000; // Delay in milliseconds (e.g., 5 seconds)
-  
-  console.log(`Simulating a ${delay / 1000} second delay before login is processed...`);
-
-  // Introduce a delay before calling the loginUser function
-  setTimeout(() => {
-    loginUser(req, res, next);
-  }, delay);
+  // Call the loginUser function immediately
+  loginUser(req, res, next);
 });
 
 module.exports = router;

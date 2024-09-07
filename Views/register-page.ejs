@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="/register-styling.css">
 </head>
 <body>
-  
   <div class="container">
     <h1>Register</h1>
     <form id="registerForm">
@@ -20,6 +19,11 @@
     <p><a href="/" id="already-have-account">Already have an account? Login here</a></p>
   </div>
 
+  <!-- Spinner container -->
+  <div id="spinner-container" style="display: none;">
+    <div id="spinner"></div>
+  </div>
+
   <!-- Popup HTML -->
   <div id="popup" class="popup">
     <div class="popup-content">
@@ -28,6 +32,8 @@
       <button id="popup-ok" class="popup-ok">Okay</button>
     </div>
   </div>
+
   <script src="/javascript/register-page-javascript.js"></script>
 </body>
+
 </html>
