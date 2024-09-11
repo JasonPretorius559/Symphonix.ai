@@ -28,6 +28,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    messageInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Stop form from submitting
+            sendButton.click(); // Trigger send button click
+        }
+    });
+
+
     sendButton.addEventListener('click', async () => {
         if (isSending) return;
 
