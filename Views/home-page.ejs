@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="/home-page-styling.css">
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar">
-        <!-- <img src="/image-data/flm-white-logo.png" alt="Logo" class="logo"> -->
         <h1>Symphonix.ai</h1>
         <div class="dropdown">
             <button class="dropbtn">
@@ -16,22 +16,25 @@
             </button>
             <div class="dropdown-content">
                 <div id="userInfo">
-                    <!-- User info will be injected here -->
+                    <!-- User info will be injected here via JavaScript -->
                 </div>
-                <a href="#" id="logoutOption">Logout</a>
+                <a href="#" id="logoutOption" class="common-button">Logout</a>
             </div>
         </div>
     </nav>
+
+    <!-- Chat Container -->
     <div class="chat-container">
+        <!-- Chat Sidebar -->
         <aside class="chat-sidebar">
             <h2>Chats</h2>
             <button id="newChatButton">New Chat</button>
             <ul id="chatList">
                 <% if (chats && chats.length > 0) { %>
                     <% chats.forEach(chat => { %>
-                        <li data-chat-id="<%= chat.id %>" class="chat-item">
+                        <li data-chat-id="<%= chat.chat_id %>" class="chat-item">
                             <span><%= chat.name %></span>
-                            <button class="delete-chat" data-chat-id="<%= chat.id %>">Delete</button>
+                            <button class="delete-chat" data-chat-id="<%= chat.chat_id %>">Delete</button>
                         </li>
                     <% }); %>
                 <% } else { %>
@@ -39,24 +42,29 @@
                 <% } %>
             </ul>
         </aside>
+
+        <!-- Main Chat Area -->
         <div class="chat-main-container">
             <main class="chat-main">
                 <div class="messages">
-                    <!-- Messages will be dynamically inserted here -->
+                    <!-- Messages will be dynamically inserted here via JavaScript -->
                 </div>
             </main>
+
+            <!-- Chat Input -->
             <footer class="chat-footer">
                 <div class="input-container">
                     <input type="text" id="messageInput" placeholder="Type your message...">
                     <button id="sendButton">Send</button>
                     <div id="sendSpinner" style="display:none;">
-                        <!-- Spinner icon here, e.g., a CSS animated spinner or a FontAwesome spinner icon -->
                         <i class="fa fa-spinner fa-spin"></i>
                     </div>
                 </div>
             </footer>
         </div>
     </div>
+
+    <!-- JavaScript Files -->
     <script src="/javascript/home-page-javascript.js"></script>
     <script src="/javascript/user-info.js"></script>
 </body>

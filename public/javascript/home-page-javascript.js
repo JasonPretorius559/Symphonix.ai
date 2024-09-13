@@ -127,9 +127,20 @@ document.addEventListener('DOMContentLoaded', () => {
             activeChat.classList.remove('active');
         }
         chatItem.classList.add('active');
+        
+        // Debugging lines to ensure chatItem has the correct ID
+        console.log('Chat item clicked:', chatItem);
+        console.log('Chat ID:', chatItem.getAttribute('data-chat-id'));
+        
         currentChatId = chatItem.getAttribute('data-chat-id');
-        await loadMessages(currentChatId);
+        
+        if (currentChatId) {
+            await loadMessages(currentChatId);
+        } else {
+            console.error('Chat ID not found.');
+        }
     }
+    
 
     async function handleChatDelete(chatItem) {
         const chatId = chatItem.getAttribute('data-chat-id');
@@ -190,27 +201,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadMessages(chatId) {
+        console.log('Loading messages for chat ID:', chatId); // Debugging line
         try {
             const response = await fetch(`/home/messages/${chatId}`);
-            const messages = await response.json();
-            messagesContainer.innerHTML = '';
-
-            messages.forEach(message => {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message');
-                if (message.userid && message.user_message) {
-                    messageElement.classList.add('user');
-                    messageElement.textContent = cleanMessageText(message.user_message);
-                } else if (message.ai_message) {
-                    messageElement.classList.add('bot');
-                    messageElement.textContent = cleanMessageText(message.ai_message);
-                }
-                messagesContainer.appendChild(messageElement);
-            });
+            
+            if (!response.ok) {
+                // If the response is not ok, handle it here
+                throw new Error(`Failed to load messages: ${response.status}`);
+            }
+    
+            const result = await response.json();
+    
+            // Check if the response indicates success
+            if (result.success) {
+                const messages = result.messages;
+                messagesContainer.innerHTML = '';
+    
+                messages.forEach(message => {
+                    const messageElement = document.createElement('div');
+                    messageElement.classList.add('message');
+                    
+                    if (message.userid && message.user_message) {
+                        messageElement.classList.add('user');
+                        messageElement.textContent = cleanMessageText(message.user_message);
+                    } else if (message.ai_message) {
+                        messageElement.classList.add('bot');
+                        messageElement.textContent = cleanMessageText(message.ai_message);
+                    }
+                    
+                    messagesContainer.appendChild(messageElement);
+                });
+            } else {
+                // Handle the case when success is false and log the error
+                console.error('Error loading messages:', result.error);
+                messagesContainer.innerHTML = `<div class="error">Error: ${result.error}</div>`;
+            }
         } catch (error) {
             console.error('Error loading messages:', error.message);
+            messagesContainer.innerHTML = `<div class="error">Error loading messages: ${error.message}</div>`;
         }
     }
+    
 
     function resetSendButton() {
         isSending = false;

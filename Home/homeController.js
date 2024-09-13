@@ -19,7 +19,7 @@ const getChats = async (userId) => {
 const getMessages = async (chatId) => {
     try {
         const [messages] = await connection.execute(
-            'SELECT * FROM messages WHERE chat_id = ? AND `delete` = 0',
+            'SELECT * FROM messages WHERE chat_id = ? AND `deleted` = 0',
             [chatId]
         );
         console.log('Fetched messages:', messages); // Debugging line
@@ -103,7 +103,7 @@ const deleteChat = async (req, res) => {
         await conn.query('UPDATE messages SET deleted = 1 WHERE chat_id = ?', [chatId]);
 
         // Mark the chat as deleted
-        const [result] = await conn.query('UPDATE chats SET deleted = 1 WHERE id = ? AND userid = ?', [chatId, userId]);
+        const [result] = await conn.query('UPDATE chats SET delete_status = 1 WHERE chat_id = ? AND userid = ?', [chatId, userId]);
 
         if (result.affectedRows === 0) {
             // If no rows were affected, the chat might not exist or the user might not own it

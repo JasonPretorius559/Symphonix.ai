@@ -309,20 +309,23 @@ body {
     text-decoration: none;
     display: block;
     border-bottom: 1px solid #4CAF50; /* Optional: border to separate items */
-    font-size: 25px;
-    
+    font-size: 16px; /* Adjust font size to match button */
     font-family: "Inter", sans-serif;
+    border-radius: 8px; /* Rounded corners to match button */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
 }
 
+/* Remove the border from the last item */
 .dropdown-content a:last-child {
-    border-bottom: none; /* Remove border from last item */
+    border-bottom: none;
 }
 
+/* Hover effect for dropdown links */
 .dropdown-content a:hover {
-    background-color: #005C3C;
-    border-radius: 8px;
-    transition: background-color 0.3s ease; /* Ease the background color transition */
+    background-color: #005C3C; /* Darker green on hover */
+    border-radius: 8px; /* Ensure rounded corners on hover */
 }
+
 
 .dropdown .dropbtn {
     background: none;
@@ -338,6 +341,29 @@ body {
     border: 2px solid #fff; /* Add a border to the image for better visibility */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for a lifted effect */
 }
+
+/* Admin Tools Button */
+#adminToolsButton {
+    background-color: #4CAF50; /* Match the dropdown background color */
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px; /* Smaller font size to fit dropdown */
+    font-family: "Inter", sans-serif;
+    cursor: pointer;
+    border-radius: 8px; /* Match dropdown border radius */
+    margin: 8px; /* Space around the button */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for a lifted effect */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+    width: calc(100% - 16px); /* Full width minus padding */
+    text-align: center; /* Center the text */
+}
+
+#adminToolsButton:hover {
+    background-color: #005C3C; /* Match the dropdown hover color */
+    border-radius: 8px;
+}
+
 
 
 #userInfo {

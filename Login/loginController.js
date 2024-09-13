@@ -9,7 +9,7 @@ const loginUser = async (req, res) => {
     return res.status(400).json({ error: 'Username and password are required.' });
   }
 
-  const query = 'SELECT userid, username, password, disabled_status FROM users WHERE username = ?';
+  const query = 'SELECT userid, username, password, access_role, disabled_status FROM users WHERE username = ?';
 
   try {
     // Execute the query using promise-based connection
@@ -31,7 +31,7 @@ const loginUser = async (req, res) => {
 
     if (isMatch) {
       // Create a session and include the user ID
-      req.session.user = { id: user.userid, username: user.username };
+      req.session.user = { id: user.userid, username: user.username, role: user.access_role };
       console.log('Session after login:', req.session); // Debug session
       return res.json({ success: true }); // Return JSON on success
     } else {

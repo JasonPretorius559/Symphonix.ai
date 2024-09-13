@@ -21,22 +21,30 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/messages/:chatId', async (req, res) => {
+router.get('/messages/:chatId?', async (req, res) => {
     try {
         const chatId = req.params.chatId;
         const userId = req.session.user?.id;
 
+        // Validate chatId and userId
+        if (!chatId) {
+            return res.status(400).json({ success: false, error: "Chat ID is required" });
+        }
         if (!userId) {
-            return res.status(400).send("User ID not found in session");
+            return res.status(401).json({ success: false, error: "User ID not found in session" });
         }
 
-        const messages = await getMessages(chatId, userId); // Ensure this function fetches messages for the user
-        res.json(messages);
+        // Fetch messages for the user and the chat
+        const messages = await getMessages(chatId, userId); // Ensure this function handles permissions properly
+
+        res.json({ success: true, messages });
     } catch (error) {
         console.error("Error fetching messages:", error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
+
 router.post('/send-message', sendMessage);
 
 router.post('/delete-chat', deleteChat);
@@ -66,12 +74,12 @@ router.get('/user-info', (req, res) => {
             return res.status(401).json({ success: false, error: 'User not authenticated' });
         }
 
-        res.json({ success: true, user: { username: user.username, id: user.id } });
+        res.json({ success: true, user: { username: user.username, id: user.id, role: user.role } });
     } catch (error) {
         console.error('Error in user-info route:', error.message);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
-})
+});
 
 
 module.exports = router;
