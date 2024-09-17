@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         adminButton.textContent = 'Admin Tools';
                         adminButton.id = 'adminToolsButton'; // Apply the CSS class
                         adminButton.addEventListener('click', () => {
-                            // Handle admin tools button click
+                            window.location.href = '/management-console';
                             console.log('Admin Tools button clicked');
                         });
 

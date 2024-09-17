@@ -1,17 +1,21 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const { sessionMiddleware, Authenticated } = require('./auth'); // Import session middleware and authentication check
+const { sessionMiddleware, Authenticated, admin } = require('./auth'); // Import session middleware and authentication check
 
 const homeRoutes = require('./Home/homeRoutes');
 const registerRoutes = require('./Register/registerRoutes');
 const loginRoutes = require('./Login/loginRoutes');
+const managementRoutes = require('./Management/managementRoutes');
+const logoutRoutes = require('./logout')
 
 
 
 const app = express();
 // Use session middleware
 app.use(sessionMiddleware);
+
+
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
 
@@ -31,6 +35,8 @@ app.use(express.json());
 app.use('/home', Authenticated, homeRoutes);
 app.use('/register', registerRoutes);
 app.use('/', loginRoutes);
+app.use('/management-console',Authenticated, admin, managementRoutes);
+app.use('/logout', logoutRoutes);
 
 // Handle 404 errors
 app.use((req, res, next) => {

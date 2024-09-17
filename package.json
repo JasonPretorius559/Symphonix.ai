@@ -12,10 +12,12 @@
     "axios": "^1.7.4",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "connect-mysql2": "^2.2.6",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.0",
-    "mysql2": "^3.11.0",
+    "mysql2": "^3.11.3",
     "sxai": "file:"
   }
 }

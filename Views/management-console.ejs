@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management Console</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Ensure the path to your stylesheet is correct -->
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2 style="text-align: center; font-size: 18px;">
+        <img src="/public/image-data/flm-green-logo.png" alt="FLM Logo">
+        FLM Management Console
+    </h2>
+    <a href="Management Console.html" class="active">Dashboard</a>
+    <a href="profiles.html">Profiles</a>
+    <a href="#">Chats</a>
+    <a href="#" class="logout-button" id="logout-button">Log Out</a>
+</div>
+
+<!-- Main content -->
+<div class="main-content">
+    <!-- Dashboard Widgets -->
+    <div class="dashboard">
+        <div class="widget" id="activeChatsWidget">
+            <h3>Overview</h3>
+            <p>Active Sessions: <span id="activeSessions"><%= totalSessions %></span></p>
+        </div>
+        <div class="widget">
+            <h3>AI Status</h3>
+            <p>Last Updated: --</p>
+            <p>Status: --</p>
+        </div>
+    </div>
+
+    <!-- Devices List -->
+    <div class="toolbar">
+        <button onclick="window.location.href='profiles.html';">Add User</button>
+        <button>Export Chats</button>
+        <div class="search-bar">
+            <input type="text" placeholder="Search...">
+        </div>
+    </div>
+
+    <div class="devices-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>User ID</th>
+                    <th>Status</th>
+                    <th>Open Chats</th> 
+                    <th>Last Session</th>
+                    <th>IP Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>1</td>
+                    <td>Active</td>
+                    <td>2</td>
+                    <td>11/09/2024</td>
+                    <td>192.168.0.38</td>
+                </tr>
+                <tr>
+                    <td>Jane Doe</td>
+                    <td>2</td>
+                    <td>Deactive</td>
+                    <td>0</td>
+                    <td>Today, 02:25 PM</td>
+                    <td>192.168.1.8</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/javascript/management-page-javascript.js"></script> <!-- Ensure the path to your JavaScript file is correct -->
+</body>
+</html>

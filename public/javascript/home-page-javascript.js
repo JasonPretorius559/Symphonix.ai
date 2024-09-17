@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutOption.addEventListener('click', async (event) => {
             event.preventDefault();
             try {
-                const response = await fetch('/home/logout', {
+                const response = await fetch('/logout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
