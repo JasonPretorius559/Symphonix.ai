@@ -1,0 +1,52 @@
+<div id="dashboard" class="tab-content active">
+    <div class="dashboard">
+        <div class="widget" id="activeChatsWidget">
+            <h3>Overview</h3>
+            <p>Active Sessions: <span id="activeSessions"><%= totalSessions %></span></p>
+        </div>
+        <div class="widget">
+            <h3>AI Status</h3>
+            <p>Last Updated: --</p>
+            <p>Status: --</p>
+        </div>
+    </div>
+
+    <!-- Devices List -->
+    <div class="toolbar">
+        <button id="addUserButton">Add User</button>
+        <button id="exportChatsButton">Export Chats</button>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search...">
+        </div>
+        <button id="refreshButton" class="refresh-spinner-button" aria-label="Refresh"></button>
+    </div>
+
+    <div class="devices-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>User ID</th>
+                    <th>Open Chats</th>
+                    <th>Last Interaction</th>
+                    <th>Expiry Time</th>
+                    <th>IP Address</th>
+                </tr>
+            </thead>
+            <tbody id="sessionsTableBody">
+                <% sessionData.forEach(session => { %>
+                    <tr>
+                        <td><%= session.UserName %></td>
+                        <td><%= session.UserID %></td>
+                        <td><%= session.OpenChats %></td>
+                        <td><%= new Date(session.LastSession).toLocaleString() %></td>
+                        <td><%= new Date(session.ExpiryTime).toLocaleString() %></td>
+                        <td><%= session.IPAddress %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/javascript/management-dashboard-javascript.js"></script> 

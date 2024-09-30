@@ -1,0 +1,46 @@
+<div class="profiles">
+    <h2>User Management</h2>
+    <div class="toolbar">
+        <button class="add-user-btn" id="add-user-btn">Add User</button>
+    </div>
+
+    <form class="user-form">
+        <!-- General Information -->
+        <h3>General</h3>
+        <div class="form-group">
+            <label for="name">Username:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password">
+        </div>
+
+        <div id="popup" class="popup">
+            <p id="popup-message">User registered successfully!</p>
+        </div>
+        
+        
+
+        <span id="dynamic-background">
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+
+            <h3>Permissions</h3>
+            <div class="form-group">
+                <label for="permissions">Permissions:</label>
+                <select id="permissions" name="permissions">
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                </select>
+            </div>
+        </span>
+    </form>
+</div>
+<script src="/javascript/management-profiles-javascript.js"></script>
