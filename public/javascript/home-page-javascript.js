@@ -2,8 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatList = document.getElementById('chatList');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
-    const spinner = document.createElement('div'); // Create spinner element
-    spinner.classList.add('spinner'); // Add spinner class
     const messagesContainer = document.querySelector('.messages');
     const logoutOption = document.getElementById('logoutOption');
     const dropdownContent = document.querySelector('.dropdown-content');
@@ -35,13 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
     sendButton.addEventListener('click', async () => {
-        if (isSending) return;
+        if (isSending || !currentChatId) return;
 
         isSending = true;
         sendButton.disabled = true;
-        sendButton.innerHTML = spinner.outerHTML;
+        sendButton.innerHTML = '<div class="spinner"></div>'; // Add spinner class
 
         let messageText = messageInput.value.trim();
         messageText = cleanMessageText(messageText); // Clean the message text before sending
@@ -140,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Chat ID not found.');
         }
     }
-    
 
     async function handleChatDelete(chatItem) {
         const chatId = chatItem.getAttribute('data-chat-id');
@@ -202,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadMessages(chatId) {
         console.log('Loading messages for chat ID:', chatId); // Debugging line
+        showSpinner(true); // Show spinner before starting to load messages
         try {
             const response = await fetch(`/home/messages/${chatId}`);
             
@@ -215,32 +212,55 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check if the response indicates success
             if (result.success) {
                 const messages = result.messages;
-                messagesContainer.innerHTML = '';
     
-                messages.forEach(message => {
-                    const messageElement = document.createElement('div');
-                    messageElement.classList.add('message');
-                    
-                    if (message.userid && message.user_message) {
-                        messageElement.classList.add('user');
-                        messageElement.textContent = cleanMessageText(message.user_message);
-                    } else if (message.ai_message) {
-                        messageElement.classList.add('bot');
-                        messageElement.textContent = cleanMessageText(message.ai_message);
-                    }
-                    
-                    messagesContainer.appendChild(messageElement);
-                });
+                // Ensure messagesContainer is defined and not null
+                if (messagesContainer) {
+                    messagesContainer.innerHTML = '';
+    
+                    messages.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.classList.add('message');
+    
+                        if (message.userid && message.user_message) {
+                            messageElement.classList.add('user');
+                            messageElement.textContent = cleanMessageText(message.user_message);
+                        } else if (message.ai_message) {
+                            messageElement.classList.add('bot');
+                            messageElement.textContent = cleanMessageText(message.ai_message);
+                        }
+    
+                        messagesContainer.appendChild(messageElement);
+                    });
+                } else {
+                    console.error('Messages container element not found');
+                }
             } else {
                 // Handle the case when success is false and log the error
                 console.error('Error loading messages:', result.error);
-                messagesContainer.innerHTML = `<div class="error">Error: ${result.error}</div>`;
+                if (messagesContainer) {
+                    messagesContainer.innerHTML = `<div class="error">Error: ${result.error}</div>`;
+                }
             }
         } catch (error) {
             console.error('Error loading messages:', error.message);
-            messagesContainer.innerHTML = `<div class="error">Error loading messages: ${error.message}</div>`;
+            if (messagesContainer) {
+                messagesContainer.innerHTML = `<div class="error">Error loading messages: ${error.message}</div>`;
+            }
+        } finally {
+            showSpinner(false); // Hide spinner after loading is complete
         }
     }
+    
+    function showSpinner(show) {
+        const spinnerContainer = document.getElementById('spinnerContainer');
+        if (spinnerContainer) {
+            spinnerContainer.style.display = show ? 'flex' : 'none';
+        } else {
+            console.error('Spinner container element not found');
+        }
+    }
+    
+
     
 
     function resetSendButton() {

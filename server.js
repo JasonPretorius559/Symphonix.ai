@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const { sessionMiddleware, Authenticated, admin } = require('./auth'); // Import session middleware and authentication check
+const { sessionMiddleware, Authenticated, admin, captureIpMiddleware, updateLastInteractionMiddleware  } = require('./auth'); // Import session middleware and authentication check
 
 const homeRoutes = require('./Home/homeRoutes');
 const registerRoutes = require('./Register/registerRoutes');
@@ -14,6 +14,8 @@ const logoutRoutes = require('./logout')
 const app = express();
 // Use session middleware
 app.use(sessionMiddleware);
+app.use(captureIpMiddleware);
+app.use(updateLastInteractionMiddleware);
 
 
 // Set the view engine to EJS

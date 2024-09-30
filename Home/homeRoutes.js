@@ -37,12 +37,15 @@ router.get('/messages/:chatId?', async (req, res) => {
         // Fetch messages for the user and the chat
         const messages = await getMessages(chatId, userId); // Ensure this function handles permissions properly
 
+        // Send JSON response with messages
         res.json({ success: true, messages });
     } catch (error) {
         console.error("Error fetching messages:", error.message);
+        // Send JSON response with error information
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
 
 
 router.post('/send-message', sendMessage);
