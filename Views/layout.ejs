@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Ensure the path to your stylesheet is correct -->
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <%- include('partials/sidebar', { activeTab: activeTab }) %>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <%- include('partials/' + body) %> <!-- Dynamic body content goes here -->
+    </div>
+
+    
+     
+    <script src="/javascript/management-tabs.js"></script> 
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!-- views/partials/sidebar.ejs -->
+<div class="sidebar">
+    <h2>
+        <img src="/image-data/flm-green-logo.png" alt="FLM Logo">
+        FLM Management Console
+    </h2>
+    <a href="/management-console/dashboard" class="<%= activeTab === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+    <a href="/management-console/profiles" class="<%= activeTab === 'profiles' ? 'active' : '' %>">Register User</a>
+    <a href="/management-console/chats" class="<%= activeTab === 'chats' ? 'active' : '' %>">Chats</a>
+    <a href="/management-console/users" class="<%= activeTab === 'users' ? 'active' : '' %>">User Management</a>
+    <a href="#" class="logout-button" id="logout-button">Log Out</a>
+</div>
+
+<script src="/javascript/management-sidebar-javascript.js"></script>
+
+
