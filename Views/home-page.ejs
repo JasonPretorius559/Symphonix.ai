@@ -7,21 +7,19 @@
     <link rel="stylesheet" href="/home-page-styling.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <h1>Symphonix.ai</h1>
-        <div class="dropdown">
-            <button class="dropbtn">
-                <img src="/image-data/flm-green-logo.png" alt="User Info">
-            </button>
-            <div class="dropdown-content">
-                <div id="userInfo">
-                    <!-- User info will be injected here via JavaScript -->
-                </div>
-                <a href="#" id="logoutOption" class="common-button">Logout</a>
+    <!-- Logo as a Dropdown Button -->
+    <div class="dropdown">
+        <button class="dropbtn">
+            <img src="/image-data/flm-green-logo.png" alt="User Info" class="logo" id="logo">
+        </button>
+        <div class="dropdown-content">
+            <div id="userInfo">
+                <!-- User info will be injected here via JavaScript -->
             </div>
+            <a href="#" id="logoutOption" class="common-button">Logout</a>
         </div>
-    </nav>
+    </div>
+
 
     <!-- Chat Container -->
     <div class="chat-container">

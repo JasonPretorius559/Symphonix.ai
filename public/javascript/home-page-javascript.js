@@ -35,40 +35,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sendButton.addEventListener('click', async () => {
         if (isSending || !currentChatId) return;
-
+    
         isSending = true;
         sendButton.disabled = true;
-        sendButton.innerHTML = '<div class="spinner"></div>'; // Add spinner class
-
+    
         let messageText = messageInput.value.trim();
         messageText = cleanMessageText(messageText); // Clean the message text before sending
+    
         if (messageText) {
+            // User message UI
             const userMessageElement = document.createElement('div');
             userMessageElement.classList.add('message', 'user');
             userMessageElement.textContent = messageText;
             messagesContainer.appendChild(userMessageElement);
-
+    
             messageInput.value = '';
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            const aiMessagePlaceholder = document.createElement('div');
-            aiMessagePlaceholder.classList.add('message', 'bot');
-            aiMessagePlaceholder.innerHTML = '<div class="spinner"></div>';
-            messagesContainer.appendChild(aiMessagePlaceholder);
-
+    
             try {
-                const response = await sendMessage(messageText);
-
-                if (response.success && response.chatId) {
-                    aiMessagePlaceholder.textContent = cleanMessageText(response.aiMessage) || 'AI Response';
-                    handleChatResponse(response);
-                } else {
-                    console.error(response.error);
-                    aiMessagePlaceholder.textContent = 'Error: Could not retrieve AI response.';
+                const response = await fetch('http://localhost:11434/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'llama3',
+                        messages: [{ role: 'user', content: messageText }],
+                        stream: true // Enable streaming if supported
+                    })
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
                 }
+    
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let result = '';
+                let inCodeBlock = false; // Track whether we're inside a code block
+                let messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'bot');
+                messagesContainer.appendChild(messageElement);
+    
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+    
+                    const chunk = decoder.decode(value, { stream: true });
+    
+                    chunk.split('\n').forEach(line => {
+                        if (line.startsWith('data: ')) {
+                            const jsonData = line.substring(6); // Remove 'data: ' prefix
+                            if (jsonData !== '[DONE]') {
+                                try {
+                                    const data = JSON.parse(jsonData);
+                                    const aiContent = data.choices[0].delta.content || '';
+    
+                                    // Detect code block start or end
+                                    if (aiContent.includes('```')) {
+                                        inCodeBlock = !inCodeBlock; // Toggle code block state
+                                    }
+    
+                                    if (inCodeBlock) {
+                                        // If in a code block, format it accordingly
+                                        messageElement.innerHTML += `<pre><code>${aiContent}</code></pre>`;
+                                    } else {
+                                        // Otherwise, just append the text to the message
+                                        messageElement.innerHTML += aiContent;
+                                    }
+    
+                                    // Scroll to the bottom after each update
+                                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                                } catch (error) {
+                                    console.error('Error parsing JSON:', error);
+                                }
+                            }
+                        }
+                    });
+                }
+    
             } catch (error) {
                 console.error('An unexpected error occurred:', error.message);
-                aiMessagePlaceholder.textContent = 'Error: Could not retrieve AI response.';
             } finally {
                 resetSendButton();
             }
@@ -77,6 +122,50 @@ document.addEventListener('DOMContentLoaded', () => {
             resetSendButton();
         }
     });
+    
+    
+    
+
+// Function to process the AI response
+function processAIResponse(response) {
+    const lines = response.split('\n');
+    let formattedResponse = '';
+    let inCodeBlock = false;
+
+    for (let line of lines) {
+        line = line.trim();
+        
+        // Detect code blocks
+        if (line.startsWith('```')) {
+            inCodeBlock = !inCodeBlock; // Toggle code block status
+            formattedResponse += inCodeBlock ? '<pre><code>' : '</code></pre>\n'; // Add HTML tags for formatting
+            continue;
+        }
+
+        // If we are in a code block, just add the line
+        if (inCodeBlock) {
+            formattedResponse += `${line}\n`;
+            continue;
+        }
+
+        // Detect lists (bulleted or numbered)
+        if (line.startsWith('- ') || /^\d+\./.test(line)) {
+            formattedResponse += `<li>${line.replace(/^- |^\d+\. /, '')}</li>\n`; // Format list items
+        } else if (line) {
+            // Regular text
+            formattedResponse += `<p>${line}</p>\n`;
+        }
+    }
+
+    // Wrap lists in <ul> or <ol>
+    const listRegex = /<li>.*<\/li>\n/g; // Match all list items
+    formattedResponse = formattedResponse.replace(/(<li>.*<\/li>\n)+/g, (match) => {
+        const isOrdered = /^\d+\./.test(match); // Check if the list is ordered
+        return isOrdered ? `<ol>${match}</ol>` : `<ul>${match}</ul>`;
+    });
+
+    return formattedResponse;
+}
 
     newChatButton.addEventListener('click', () => {
         if (isCooldownActive) return;

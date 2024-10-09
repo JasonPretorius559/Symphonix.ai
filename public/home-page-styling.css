@@ -1,82 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Beginner:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Beginner:wght@400;700&family=Inter:wght@400;600;700;800&display=swap');
 
-/* Apply Rubik font to the entire page */
+/* Global Styles */
 body {
     margin: 0;
     font-family: 'Rubik', sans-serif;
-    background-color: #f4f4f4;
+    background-color: #eef2f3;
     height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-.navbar {
-    background-color: #01713F;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    height: 60px;
-}
-
-.navbar .logo {
-    position: absolute;
-    left: 7px;
-    height: 60px; /* Adjust as needed */
-    cursor: pointer;
-}
-
-.navbar h1 {
-    margin: 0;
-    font-size: 30px;
-    text-align: center;
-    flex: 1; /* This will center the title */
-    font-family: "Inter", sans-serif;
-}
-
+/* Chat Container */
 .chat-container {
     display: flex;
     flex: 1;
     overflow: hidden;
+    
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Sidebar Styles */
 .chat-sidebar {
-    width: 300px;
+    width: 300px; /* Width of the sidebar */
+    height: 100%; /* Full height */
     background-color: #2c2c2c;
     color: white;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    /* padding: 10px; Adjusted padding */
     box-sizing: border-box;
     overflow: hidden;
+    border-radius: 0; /* Set border-radius to 0 for square edges */
 }
 
 .chat-sidebar h2 {
-    margin: 0;
-    padding-bottom: 10px;
-    flex-shrink: 0;
+    margin: 0 0 10px 0; /* Adjusted margin */
+    font-size: 30px; /* Font size */
+    font-weight: 500;
+    padding: 10px 0px 0px 10px;
 }
 
 #newChatButton {
-    margin-bottom: 10px;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    background-color: #01713F;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    flex-shrink: 0;
+    margin: 0px 5px 10px 5px; /* Space below the button */
+    padding: 10px 20px; /* Adjust padding for a more spacious feel */
+    border: none; /* Remove default border */
+    background-color: #4CAF50; /* Bright green background */
+    color: white; /* White text color for contrast */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Adjusted font size for better readability */
+    border-radius: 8px; /* Slightly more rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
 }
 
 #newChatButton:hover {
-    background-color: #45a049;
+    background-color: #45a049; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
 }
+
 
 #chatList {
     list-style: none;
@@ -88,29 +70,33 @@ body {
 
 .chat-item {
     padding: 10px;
-    background-color: #3a3a3a;
-    margin-bottom: 10px;
+    background-color: #2c2c2c;
+    margin-bottom: 1px;
     cursor: pointer;
-    border-radius: 5px;
-    position: relative; /* Required for positioning the delete button */
+    /* border-radius: 4px; */
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: background-color 0.3s;
+    font-size: 16px
 }
-
 .chat-item:hover {
-    background-color: #01713F;
-}
-
-.chat-item.active {
     background-color: #4CAF50;
 }
 
+.chat-item.active {
+    color: #00af11;
+    font-weight: 500;
+}
+
+/* Main Chat Area */
 .chat-main-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     background-color: white;
+    border-top-right-radius: 12px; /* Keep rounded edges for main chat area */
+    border-bottom-right-radius: 12px;
     overflow: hidden;
 }
 
@@ -121,41 +107,54 @@ body {
 }
 
 .messages {
-    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
 }
 
 .message {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    max-width: 60%;
-    word-break: normal;        /* Only break at normal word breaks */
-    overflow-wrap: normal;     /* Prevent arbitrary word breaks */
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    max-width: 75%;
+    opacity: 0; /* Start invisible */
+    animation: fadeIn 0.5s ease-in-out forwards; /* Fade-in animation */
 }
 
+/* User Message Styles */
 .message.user {
     background-color: #01713F;
     align-self: flex-end;
-    border-radius: 10px 10px 0 10px;
+    border-radius: 8px 8px 0 8px;
     color: white;
 }
 
+/* Bot Message Styles */
 .message.bot {
-    background-color: #000000; /* Change to black */
+    background-color: #343a40; /* Change background to dark gray */
     align-self: flex-start;
-    border-radius: 10px 10px 0 10px;
-    color: white; /* Keep the text color white */
+    border-radius: 8px 8px 0 8px;
+    color: white;
 }
 
+/* Fade-in Animation Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Footer Styles */
 .chat-footer {
     padding: 20px;
     background-color: #f9f9f9;
     border-top: 1px solid #e0e0e0;
     display: flex;
     align-items: center;
-    flex-shrink: 0;
 }
 
 .input-container {
@@ -165,13 +164,12 @@ body {
     background-color: #e0e0e0;
     border-radius: 30px;
     padding: 5px;
-    box-sizing: border-box;
 }
 
 #messageInput {
     flex: 1;
-    padding: 10px;
-    font-size: 16px;
+    padding: 8px; /* Reduced padding */
+    font-size: 12px; /* Reduced font size */
     border: none;
     border-radius: 30px 0 0 30px;
     outline: none;
@@ -179,22 +177,21 @@ body {
 }
 
 #sendButton {
-    padding: 10px 20px;
+    padding: 6px 12px; /* Smaller padding */
     border: none;
-    background-color: #01713F;
+    background-color: #4CAF50;
     color: white;
     cursor: pointer;
     border-radius: 0 30px 30px 0;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 12px; /* Reduced font size */
+    transition: background-color 0.3s;
 }
 
 #sendButton:hover {
     background-color: #45a049;
 }
 
+/* Media Queries */
 @media (max-width: 768px) {
     .chat-sidebar {
         width: 100%;
@@ -202,29 +199,6 @@ body {
         flex-direction: row;
         overflow-x: auto;
         overflow-y: hidden;
-        flex-shrink: 0;
-    }
-
-    .chat-sidebar h2 {
-        display: none;
-    }
-
-    #newChatButton {
-        margin: 0 20px 0 0;
-        flex: 0 0 auto;
-    }
-
-    #chatList {
-        display: flex;
-        flex-direction: row;
-        width: auto;
-        flex: 1;
-        margin: 0;
-        padding: 0;
-    }
-
-    .chat-item {
-        padding: 10px 40px 10px 10px; /* Adjust padding for delete button */
     }
 
     .chat-main-container {
@@ -232,204 +206,111 @@ body {
     }
 }
 
-/* Custom scrollbar for WebKit browsers */
+/* Custom Scrollbar Styles */
 .chat-sidebar #chatList::-webkit-scrollbar {
-    width: 6px; /* Make the scrollbar thinner */
-}
-
-.chat-sidebar #chatList::-webkit-scrollbar-track {
-    background-color: #01713F; /* Match the sidebar background */
+    width: 6px;
 }
 
 .chat-sidebar #chatList::-webkit-scrollbar-thumb {
-    background-color: #01713F; /* A green color to match the theme */
-    border-radius: 10px; /* Round the scrollbar edges */
+    background-color: #4CAF50;
+    border-radius: 10px;
 }
 
 .chat-sidebar #chatList::-webkit-scrollbar-thumb:hover {
-    background-color: #01713F; /* Darken on hover */
+    background-color: #45a049;
 }
 
-/* Custom scrollbar for Firefox */
-.chat-sidebar #chatList {
-    scrollbar-width: thin; /* Make the scrollbar thinner */
-    scrollbar-color: #01713F #2c2c2c; /* Set scrollbar thumb and track color */
-}
-
+/* Delete Button Styles */
 .delete-chat {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
     background-color: #e74c3c;
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
+    border-radius: 5px; /* Optional: keep or remove rounding */
+    padding: 5px 10px; /* Reduced padding */
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px; /* Reduced font size */
 }
 
 .delete-chat:hover {
     background-color: #c0392b;
 }
 
-/* Add CSS for dropdown menu */
+/* Dropdown Menu Styles */
 .dropdown {
-    position: relative;
-    display: inline-block;
+    position: absolute; /* Position relative to the nearest positioned ancestor */
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    z-index: 10; /* Ensure it appears above other elements */
 }
+
+.dropbtn {
+    background: none; /* Remove default button styling */
+    border: none; /* Remove border */
+    cursor: pointer; /* Pointer on hover */
+}
+
+.logo {
+    width: 40px; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 50%; /* Makes the logo circular */
+    border: 2px solid #4CAF50; /* Optional: Add a border color */
+    padding: 5px; /* Optional: Padding for spacing between border and logo */
+    background-color: white; /* Optional: Background color for contrast */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for depth */
+}
+
 
 .dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0; /* Align dropdown to the right */
-    top: 100%;
-    background-color: #4CAF50;
-    border-radius: 8px;
-    width: 500px; /* Set width */
-    height: 500px; /* Set height */
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    padding: 0; /* Remove padding to avoid extra space */
-    margin: 0; /* Ensure no extra margin */
+    display: none; /* Hide dropdown content by default */
+    position: absolute; /* Positioned relative to the dropdown */
+    right: 0; /* Aligns dropdown content to the right */
+    top: 100%; /* Positions below the dropdown button */
+    background-color: #4CAF50; /* Background color for dropdown */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    z-index: 9; /* Dropdown content below logo */
 }
 
-.dropdown-content.show {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-    margin-top: 16px; /* Ensure there's space between dropdown and the button */
+.dropdown:hover .dropdown-content {
+    display: block; /* Show dropdown on hover */
 }
 
-.dropdown-content a {
-    color: white; /* Adjust text color to match the background */
-    padding: 12px 16px; /* Adjust padding as needed */
-    text-decoration: none;
-    display: block;
-    border-bottom: 1px solid #4CAF50; /* Optional: border to separate items */
-    font-size: 16px; /* Adjust font size to match button */
-    font-family: "Inter", sans-serif;
-    border-radius: 8px; /* Rounded corners to match button */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
-}
-
-/* Remove the border from the last item */
-.dropdown-content a:last-child {
-    border-bottom: none;
-}
-
-/* Hover effect for dropdown links */
-.dropdown-content a:hover {
-    background-color: #005C3C; /* Darker green on hover */
-    border-radius: 8px; /* Ensure rounded corners on hover */
-}
-
-
-.dropdown .dropbtn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-.dropdown img {
-    width: 40px; /* Adjust the size of the image */
-    height: 40px; /* Adjust the size of the image */
-    border-radius: 50%;
-    border: 2px solid #fff; /* Add a border to the image for better visibility */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for a lifted effect */
-}
-
-/* Admin Tools Button */
-#adminToolsButton {
-    background-color: #4CAF50; /* Match the dropdown background color */
-    color: white;
-    border: none;
-    padding: 12px 16px;
-    font-size: 16px; /* Smaller font size to fit dropdown */
-    font-family: "Inter", sans-serif;
-    cursor: pointer;
-    border-radius: 8px; /* Match dropdown border radius */
-    margin: 8px; /* Space around the button */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for a lifted effect */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
-    width: calc(100% - 16px); /* Full width minus padding */
-    text-align: center; /* Center the text */
-}
-
-#adminToolsButton:hover {
-    background-color: #005C3C; /* Match the dropdown hover color */
-    border-radius: 8px;
-}
-
-
-
+/* Additional styles for the user info and logout option */
 #userInfo {
-    color: rgb(255, 255, 255); /* Adjust text color */
-    
-    font-size: 20px; /* Increase font size */
-    font-weight: bold; /* Make the font bold */
-    background-color: #000000; /* Set background color */
-    height: 10%; /* Set height */
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    /* Flexbox settings to center content */
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    text-align: center; /* Ensure text is centered within the element */
-    font-size: 25px;
-    font-family: "Inter", sans-serif;
+    padding: 10px; /* Padding for user info */
+    color: white; /* Text color */
 }
 
+.common-button {
+    color: white; /* Text color for buttons */
+    padding: 6px 10px; /* Reduced padding */
+    text-decoration: none; /* Remove underline */
+    display: block; /* Full-width */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.common-button:hover {
+    background-color: #005C3C; /* Background color on hover */
+}
+
+/* Spinner Styles */
 .spinner {
     border: 4px solid #f3f3f3; /* Light grey */
-    border-top: 4px solid #01713F; /* Green */
+    border-top: 4px solid #4CAF50; /* Green */
     border-radius: 50%;
     width: 20px;
     height: 20px;
     animation: spin 1s linear infinite;
-    display: inline-block;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Modify the #sendButton styling to handle disabled state */
+/* Modify Send Button Disabled State */
 #sendButton:disabled {
-    background-color: #95a5a6; /* Gray background when disabled */
+    background-color: #95a5a6;
     cursor: not-allowed;
-}
-
-/* Spinner Styles */
-.message-spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top: 4px solid #01713F;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
 }
 
 /* Spinner Animation */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-#spinnerContainer {
-    position: fixed; /* Position it fixed to avoid affecting other layout elements */
-    top: 0; /* Align to the top of the viewport */
-    left: 0; /* Align to the left of the viewport */
-    width: 100%; /* Cover the full viewport width */
-    height: 100%; /* Cover the full viewport height */
-    display: none; /* Hidden by default */
-    justify-content: center; /* Center spinner horizontally */
-    align-items: center; /* Center spinner vertically */
-    
-    z-index: 9999; /* Ensure it's above other content */
 }
