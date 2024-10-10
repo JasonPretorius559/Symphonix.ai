@@ -31,12 +31,11 @@ const getMessages = async (chatId) => {
 };
 
 const sendMessage = async (req, res) => {
-    const { chatId, message } = req.body;
+    const { chatId, userMessage, aiMessage } = req.body; // Receive user message and AI message from the request
     const userId = req.session.user?.id;
-    const defaultName = 'Default Chat';
 
-    if (!message) {
-        return res.status(400).json({ success: false, error: 'Message is required' });
+    if (!userMessage) {
+        return res.status(400).json({ success: false, error: 'User message is required' });
     }
 
     if (!userId) {
@@ -45,6 +44,7 @@ const sendMessage = async (req, res) => {
 
     try {
         let newChatId = chatId;
+        let defaultName = 'Default Chat'; // Fallback name
 
         if (!chatId) {
             // Create a new chat
@@ -58,30 +58,29 @@ const sendMessage = async (req, res) => {
         // Insert user message into the database
         await connection.execute(
             'INSERT INTO messages (chat_id, userid, user_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
-            [newChatId, userId, message, defaultName]
+            [newChatId, userId, userMessage, defaultName]
         );
 
-        // Send the message to the AI and get the response
-        const aiResponse = await axios.post('http://localhost:5000/chat', { message: message });
+        if (aiMessage) {
+            // Set the default name to the first sentence of the AI's message
+            const firstSentence = aiMessage.split('. ')[0]; // Get the first sentence
+            defaultName = firstSentence;
 
-        const aiMessage = aiResponse.data.reply || null;
-
-        if (!aiMessage) {
-            console.error('AI Response is empty');
+            // Insert AI response into the database with the new name
+            await connection.execute(
+                'INSERT INTO messages (chat_id, userid, ai_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
+                [newChatId, null, aiMessage, defaultName]
+            );
         }
 
-        // Insert AI response into the database
-        await connection.execute(
-            'INSERT INTO messages (chat_id, userid, ai_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
-            [newChatId, null, aiMessage, defaultName]
-        );
-
-        res.json({ success: true, aiMessage: aiMessage, chatId: newChatId });
+        // Do not send a response to the client
+        res.status(204).send(); // No Content
     } catch (error) {
         console.error('Error sending message:', error.message);
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 const deleteChat = async (req, res) => {
     const { chatId } = req.body;

@@ -16,7 +16,6 @@ body {
     display: flex;
     flex: 1;
     overflow: hidden;
-    
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -28,7 +27,6 @@ body {
     color: white;
     display: flex;
     flex-direction: column;
-    /* padding: 10px; Adjusted padding */
     box-sizing: border-box;
     overflow: hidden;
     border-radius: 0; /* Set border-radius to 0 for square edges */
@@ -59,7 +57,6 @@ body {
     transform: translateY(-2px); /* Slight lift effect on hover */
 }
 
-
 #chatList {
     list-style: none;
     padding: 0;
@@ -73,13 +70,13 @@ body {
     background-color: #2c2c2c;
     margin-bottom: 1px;
     cursor: pointer;
-    /* border-radius: 4px; */
     display: flex;
     align-items: center;
     justify-content: space-between;
     transition: background-color 0.3s;
-    font-size: 16px
+    font-size: 16px;
 }
+
 .chat-item:hover {
     background-color: #4CAF50;
 }
@@ -98,6 +95,7 @@ body {
     border-top-right-radius: 12px; /* Keep rounded edges for main chat area */
     border-bottom-right-radius: 12px;
     overflow: hidden;
+    
 }
 
 .chat-main {
@@ -235,12 +233,14 @@ body {
     background-color: #c0392b;
 }
 
-/* Dropdown Menu Styles */
-.dropdown {
-    position: absolute; /* Position relative to the nearest positioned ancestor */
-    top: 10px; /* Adjust as needed */
-    right: 10px; /* Adjust as needed */
+/* Dropdown Container */
+.dropdown-container {
+    position: fixed; /* Fixes the dropdown in place */
+    bottom: 10px; /* 10px from the bottom of the viewport */
+    left: 10px; /* 10px from the left of the viewport */
     z-index: 10; /* Ensure it appears above other elements */
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center items vertically */
 }
 
 .dropbtn {
@@ -257,14 +257,19 @@ body {
     padding: 5px; /* Optional: Padding for spacing between border and logo */
     background-color: white; /* Optional: Background color for contrast */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for depth */
+    margin-right: 10px; /* Space between logo and dropdown */
 }
 
+.dropdown {
+    position: relative; /* Allows dropdown-content to be positioned relative to this element */
+    align-items: first baseline;
+}
 
 .dropdown-content {
     display: none; /* Hide dropdown content by default */
     position: absolute; /* Positioned relative to the dropdown */
-    right: 0; /* Aligns dropdown content to the right */
-    top: 100%; /* Positions below the dropdown button */
+    left: 0; /* Align dropdown content to the left */
+    bottom: 100%; /* Position above the dropdown button */
     background-color: #4CAF50; /* Background color for dropdown */
     border-radius: 8px; /* Rounded corners */
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Shadow for depth */
@@ -291,6 +296,7 @@ body {
 
 .common-button:hover {
     background-color: #005C3C; /* Background color on hover */
+    border-radius: 8px;
 }
 
 /* Spinner Styles */
@@ -314,3 +320,28 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Admin Button Styles */
+.admin-button {
+    margin: 10px; /* Space around the button */
+    padding: 10px 20px; /* Padding for a spacious feel */
+    border: none; /* Remove default border */
+    background-color: #4CAF50; /* Bootstrap primary color (blue) */
+    color: white; /* White text for contrast */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Adjusted font size */
+    border-radius: 8px; /* Slightly rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+}
+
+.admin-button:hover {
+    background-color: #276029; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.admin-button:disabled {
+    background-color: #95a5a6; /* Gray background when disabled */
+    cursor: not-allowed; /* Not-allowed cursor */
+}
+

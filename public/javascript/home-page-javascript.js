@@ -52,7 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
             messageInput.value = '';
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
+            let aiMessageContent = ''; // Variable to hold the AI message content
+    
             try {
+                // Proceed with fetching the response from the chat API
                 const response = await fetch('http://localhost:11434/v1/chat/completions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -69,8 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder('utf-8');
-                let result = '';
                 let inCodeBlock = false; // Track whether we're inside a code block
+                let inOrderedList = false; // Track if inside ordered list
+                let inUnorderedList = false; // Track if inside unordered list
                 let messageElement = document.createElement('div');
                 messageElement.classList.add('message', 'bot');
                 messagesContainer.appendChild(messageElement);
@@ -87,7 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (jsonData !== '[DONE]') {
                                 try {
                                     const data = JSON.parse(jsonData);
-                                    const aiContent = data.choices[0].delta.content || '';
+                                    let aiContent = data.choices[0].delta.content || '';
+                                    aiMessageContent += aiContent; // Accumulate AI message content
     
                                     // Detect code block start or end
                                     if (aiContent.includes('```')) {
@@ -98,12 +103,45 @@ document.addEventListener('DOMContentLoaded', () => {
                                         // If in a code block, format it accordingly
                                         messageElement.innerHTML += `<pre><code>${aiContent}</code></pre>`;
                                     } else {
-                                        // Otherwise, just append the text to the message
-                                        messageElement.innerHTML += aiContent;
-                                    }
+                                        // Handle ordered list (1., 2., etc.)
+                                        if (/^\d+\.\s/.test(aiContent)) {
+                                            if (!inOrderedList) {
+                                                messageElement.innerHTML += `<ol>`;
+                                                inOrderedList = true;
+                                            }
+                                            aiContent = aiContent.replace(/^\d+\.\s/, ''); // Remove the number from content
+                                            messageElement.innerHTML += `<li>${aiContent}</li>`;
+                                        } else if (inOrderedList) {
+                                            // Close ordered list if no longer in list
+                                            messageElement.innerHTML += `</ol>`;
+                                            inOrderedList = false;
+                                        }
     
-                                    // Scroll to the bottom after each update
-                                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                                        // Handle unordered list (*, -, +)
+                                        if (/^[*+-]\s/.test(aiContent)) {
+                                            if (!inUnorderedList) {
+                                                messageElement.innerHTML += `<ul>`;
+                                                inUnorderedList = true;
+                                            }
+                                            aiContent = aiContent.replace(/^[*+-]\s/, ''); // Remove the bullet from content
+                                            messageElement.innerHTML += `<li>${aiContent}</li>`;
+                                        } else if (inUnorderedList) {
+                                            // Close unordered list if no longer in list
+                                            messageElement.innerHTML += `</ul>`;
+                                            inUnorderedList = false;
+                                        }
+    
+                                        // Detect bold text (wrapped in **)
+                                        aiContent = aiContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+                                        // If not in a list or code block, append regular content
+                                        if (!inCodeBlock && !inOrderedList && !inUnorderedList) {
+                                            messageElement.innerHTML += aiContent;
+                                        }
+    
+                                        // Scroll to the bottom after each update
+                                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                                    }
                                 } catch (error) {
                                     console.error('Error parsing JSON:', error);
                                 }
@@ -111,6 +149,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 }
+    
+                // Now send both user message and AI message to the server to save them in the database
+                await fetch('/home/send-message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chatId: currentChatId,
+                        userMessage: messageText,
+                        aiMessage: aiMessageContent // Make sure this is included
+                    })
+                });
     
             } catch (error) {
                 console.error('An unexpected error occurred:', error.message);
@@ -125,47 +174,49 @@ document.addEventListener('DOMContentLoaded', () => {
     
     
     
+    
+    
 
-// Function to process the AI response
-function processAIResponse(response) {
-    const lines = response.split('\n');
-    let formattedResponse = '';
-    let inCodeBlock = false;
+// // Function to process the AI response
+// function processAIResponse(response) {
+//     const lines = response.split('\n');
+//     let formattedResponse = '';
+//     let inCodeBlock = false;
 
-    for (let line of lines) {
-        line = line.trim();
+//     for (let line of lines) {
+//         line = line.trim();
         
-        // Detect code blocks
-        if (line.startsWith('```')) {
-            inCodeBlock = !inCodeBlock; // Toggle code block status
-            formattedResponse += inCodeBlock ? '<pre><code>' : '</code></pre>\n'; // Add HTML tags for formatting
-            continue;
-        }
+//         // Detect code blocks
+//         if (line.startsWith('```')) {
+//             inCodeBlock = !inCodeBlock; // Toggle code block status
+//             formattedResponse += inCodeBlock ? '<pre><code>' : '</code></pre>\n'; // Add HTML tags for formatting
+//             continue;
+//         }
 
-        // If we are in a code block, just add the line
-        if (inCodeBlock) {
-            formattedResponse += `${line}\n`;
-            continue;
-        }
+//         // If we are in a code block, just add the line
+//         if (inCodeBlock) {
+//             formattedResponse += `${line}\n`;
+//             continue;
+//         }
 
-        // Detect lists (bulleted or numbered)
-        if (line.startsWith('- ') || /^\d+\./.test(line)) {
-            formattedResponse += `<li>${line.replace(/^- |^\d+\. /, '')}</li>\n`; // Format list items
-        } else if (line) {
-            // Regular text
-            formattedResponse += `<p>${line}</p>\n`;
-        }
-    }
+//         // Detect lists (bulleted or numbered)
+//         if (line.startsWith('- ') || /^\d+\./.test(line)) {
+//             formattedResponse += `<li>${line.replace(/^- |^\d+\. /, '')}</li>\n`; // Format list items
+//         } else if (line) {
+//             // Regular text
+//             formattedResponse += `<p>${line}</p>\n`;
+//         }
+//     }
 
-    // Wrap lists in <ul> or <ol>
-    const listRegex = /<li>.*<\/li>\n/g; // Match all list items
-    formattedResponse = formattedResponse.replace(/(<li>.*<\/li>\n)+/g, (match) => {
-        const isOrdered = /^\d+\./.test(match); // Check if the list is ordered
-        return isOrdered ? `<ol>${match}</ol>` : `<ul>${match}</ul>`;
-    });
+//     // Wrap lists in <ul> or <ol>
+//     const listRegex = /<li>.*<\/li>\n/g; // Match all list items
+//     formattedResponse = formattedResponse.replace(/(<li>.*<\/li>\n)+/g, (match) => {
+//         const isOrdered = /^\d+\./.test(match); // Check if the list is ordered
+//         return isOrdered ? `<ol>${match}</ol>` : `<ul>${match}</ul>`;
+//     });
 
-    return formattedResponse;
-}
+//     return formattedResponse;
+// }
 
     newChatButton.addEventListener('click', () => {
         if (isCooldownActive) return;
