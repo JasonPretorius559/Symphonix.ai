@@ -1,0 +1,101 @@
+/* Dropdown Container */
+.dropdown-container {
+    position: fixed; /* Fixes the dropdown in place */
+    bottom: 10px; /* 10px from the bottom of the viewport */
+    left: 10px; /* 10px from the left of the viewport */
+    z-index: 10; /* Ensure it appears above other elements */
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center items vertically */
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background: none; /* Remove default button styling */
+    border: none; /* Remove border */
+    cursor: pointer; /* Pointer on hover */
+}
+
+/* Spin animation for the logo */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Logo inside dropdown */
+.logo {
+    width: 40px; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 50%; /* Makes the logo circular */
+    border: 2px solid #4CAF50; /* Optional: Add a border color */
+    padding: 5px; /* Optional: Padding for spacing between border and logo */
+    background-color: white; /* Optional: Background color for contrast */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for depth */
+    margin-right: 10px; /* Space between logo and dropdown */
+    transition: transform 0.5s; /* Smooth transition for spinning */
+}
+
+
+/* Dropdown - Allow Content to Open Upwards */
+.dropdown {
+    position: relative; /* Allows dropdown-content to be positioned relative to this element */
+}
+
+.dropdown-content {
+    display: none; /* Hide dropdown content by default */
+    position: absolute; /* Position it absolutely */
+    background-color: #fff; /* Background color for dropdown */
+    min-width: 200px; /* Minimum width for dropdown */
+    max-width: 250px; /* Set a maximum width for a longer dropdown */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2); /* Shadow for dropdown */
+    z-index: 1; /* Ensure it appears above other elements */
+    left: 0; /* Align with the left edge of the dropdown button */
+    bottom: 100%; /* Position above the dropdown button */
+    margin-bottom: 5px; /* Space between dropdown and button */
+    padding: 0; /* Remove padding for a slimmer appearance */
+    border-radius: 8px; /* Rounded corners */
+    transition: max-height 0.3s ease, opacity 0.3s ease; /* Transition for smooth opening */
+    max-height: 0; /* Start hidden */
+    opacity: 0; /* Start hidden */
+    overflow: hidden; /* Hide overflow */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Arrange items in a column */
+}
+
+/* Active class to control visibility */
+.dropdown-content.active {
+    display: flex; /* Show dropdown content as flexbox */
+    max-height: 500px; /* Set a maximum height when visible */
+    opacity: 1; /* Make visible */
+}
+
+/* Style for items within the dropdown */
+.dropdown-content a, .dropdown-content .common-text {
+    display: block; /* Ensure items take up the full width */
+    padding: 8px 10px; /* Add padding to items for better click area */
+    text-align: left; /* Align text to the left */
+    color: #333; /* Text color */
+    text-decoration: none; /* Remove underline */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    border: none; /* Remove border */
+    background: none; /* Remove background */
+}
+
+/* Change background on hover for dropdown items */
+.dropdown-content a:hover, .dropdown-content .common-text:hover {
+    background-color: #f1f1f1; /* Light gray background on hover */
+}
+
+/* Additional styles for the user info */
+#userInfo {
+    padding: 5px 10px; /* Reduced padding for user info */
+    color: black; /* Change text color for better contrast */
+}
+
+/* Common button styles (optional) */
+.common-button {
+    display: none; /* Hide buttons since we want text */
+}

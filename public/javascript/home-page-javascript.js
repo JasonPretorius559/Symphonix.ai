@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    messageInput.addEventListener('input', adjustHeight); // Adjust height on input
     messageInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault(); // Stop form from submitting
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     sendButton.addEventListener('click', async () => {
-        if (isSending || !currentChatId) return;
+        if (isSending) return;
     
         isSending = true;
         sendButton.disabled = true;
@@ -50,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messagesContainer.appendChild(userMessageElement);
     
             messageInput.value = '';
+            adjustHeight(); // Reset input height
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
             let aiMessageContent = ''; // Variable to hold the AI message content
@@ -150,14 +152,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
     
-                // Now send both user message and AI message to the server to save them in the database
-                await fetch('/home/send-message', {
+                // Send both user message and AI message to the server to save them in the database
+                await fetch('/home/insert-message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        chatId: currentChatId,
+                        chatId: currentChatId, // currentChatId can still be null; backend will handle this
                         userMessage: messageText,
-                        aiMessage: aiMessageContent // Make sure this is included
+                        aiMessage: aiMessageContent
                     })
                 });
     
@@ -171,52 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
             resetSendButton();
         }
     });
-    
-    
-    
-    
-    
-
-// // Function to process the AI response
-// function processAIResponse(response) {
-//     const lines = response.split('\n');
-//     let formattedResponse = '';
-//     let inCodeBlock = false;
-
-//     for (let line of lines) {
-//         line = line.trim();
-        
-//         // Detect code blocks
-//         if (line.startsWith('```')) {
-//             inCodeBlock = !inCodeBlock; // Toggle code block status
-//             formattedResponse += inCodeBlock ? '<pre><code>' : '</code></pre>\n'; // Add HTML tags for formatting
-//             continue;
-//         }
-
-//         // If we are in a code block, just add the line
-//         if (inCodeBlock) {
-//             formattedResponse += `${line}\n`;
-//             continue;
-//         }
-
-//         // Detect lists (bulleted or numbered)
-//         if (line.startsWith('- ') || /^\d+\./.test(line)) {
-//             formattedResponse += `<li>${line.replace(/^- |^\d+\. /, '')}</li>\n`; // Format list items
-//         } else if (line) {
-//             // Regular text
-//             formattedResponse += `<p>${line}</p>\n`;
-//         }
-//     }
-
-//     // Wrap lists in <ul> or <ol>
-//     const listRegex = /<li>.*<\/li>\n/g; // Match all list items
-//     formattedResponse = formattedResponse.replace(/(<li>.*<\/li>\n)+/g, (match) => {
-//         const isOrdered = /^\d+\./.test(match); // Check if the list is ordered
-//         return isOrdered ? `<ol>${match}</ol>` : `<ul>${match}</ul>`;
-//     });
-
-//     return formattedResponse;
-// }
 
     newChatButton.addEventListener('click', () => {
         if (isCooldownActive) return;
@@ -226,16 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             isCooldownActive = false;
         }, 1000);
-    });
-
-    dropdownButton.addEventListener('click', () => {
-        toggleDropdown();
-    });
-
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('.dropdown')) {
-            closeDropdown();
-        }
     });
 
     if (logoutOption) {
@@ -302,40 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function sendMessage(messageText) {
-        const response = await fetch('/home/send-message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chatId: currentChatId, message: messageText })
-        });
-        return await response.json();
-    }
-
-    function handleChatResponse(response) {
-        let chatItem = document.querySelector(`.chat-item[data-chat-id="${response.chatId}"]`);
-
-        if (!chatItem) {
-            chatItem = document.createElement('div');
-            chatItem.classList.add('chat-item');
-            chatItem.setAttribute('data-chat-id', response.chatId);
-
-            const chatName = document.createElement('span');
-            chatName.textContent = response.chatName || 'Default Chat';
-            chatItem.appendChild(chatName);
-
-            const deleteButton = document.createElement('button');
-            deleteButton.classList.add('delete-chat');
-            deleteButton.textContent = 'Delete';
-            chatItem.appendChild(deleteButton);
-
-            chatList.appendChild(chatItem);
-        }
-
-        chatItem.classList.add('active');
-        currentChatId = response.chatId;
-        loadMessages(currentChatId);
-    }
-
     async function loadMessages(chatId) {
         console.log('Loading messages for chat ID:', chatId); // Debugging line
         showSpinner(true); // Show spinner before starting to load messages
@@ -400,13 +312,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-
-    
+    function adjustHeight() {
+        messageInput.style.height = 'auto'; // Reset height to allow for resizing
+        messageInput.style.height = `${messageInput.scrollHeight}px`; // Set height based on scroll height
+    }
 
     function resetSendButton() {
         isSending = false;
         sendButton.disabled = false;
-        sendButton.innerHTML = 'Send';
     }
 
     function handleNewChat() {
@@ -416,14 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         messagesContainer.innerHTML = '';
         messageInput.value = '';
+        adjustHeight(); // Reset input height
         currentChatId = null;
     }
 
-    function toggleDropdown() {
-        dropdownContent.classList.toggle('show');
-    }
-
-    function closeDropdown() {
-        dropdownContent.classList.remove('show');
-    }
 });

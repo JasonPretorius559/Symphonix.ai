@@ -30,7 +30,7 @@ const getMessages = async (chatId) => {
     }
 };
 
-const sendMessage = async (req, res) => {
+const InsertMessage = async (req, res) => {
     const { chatId, userMessage, aiMessage } = req.body; // Receive user message and AI message from the request
     const userId = req.session.user?.id;
 
@@ -64,22 +64,34 @@ const sendMessage = async (req, res) => {
         if (aiMessage) {
             // Set the default name to the first sentence of the AI's message
             const firstSentence = aiMessage.split('. ')[0]; // Get the first sentence
-            defaultName = firstSentence;
+            defaultName = firstSentence || defaultName;
 
-            // Insert AI response into the database with the new name
+            // Update the chat name in the `chats` table
+            await connection.execute(
+                'UPDATE chats SET name = ? WHERE id = ?',
+                [defaultName, newChatId]
+            );
+
+            // Insert AI response into the database
             await connection.execute(
                 'INSERT INTO messages (chat_id, userid, ai_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
                 [newChatId, null, aiMessage, defaultName]
             );
         }
 
-        // Do not send a response to the client
-        res.status(204).send(); // No Content
+        // Send the new chatId back if a new chat was created
+        if (!chatId) {
+            return res.status(201).json({ success: true, chatId: newChatId });
+        } else {
+            res.status(204).send(); // No content for existing chats
+        }
+
     } catch (error) {
         console.error('Error sending message:', error.message);
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 
 const deleteChat = async (req, res) => {
@@ -127,4 +139,4 @@ const deleteChat = async (req, res) => {
     }
 };
 
-module.exports = { getChats, getMessages, sendMessage, deleteChat };
+module.exports = { getChats, getMessages, InsertMessage, deleteChat };
