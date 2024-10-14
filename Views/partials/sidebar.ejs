@@ -1,4 +1,6 @@
 <!-- views/partials/sidebar.ejs -->
+ <link rel="stylesheet" href="/user-info.css">
+ 
 <div class="sidebar">
     <h2>
         <img src="/image-data/flm-green-logo.png" alt="FLM Logo">
@@ -8,9 +10,18 @@
     <a href="/management-console/profiles" class="<%= activeTab === 'profiles' ? 'active' : '' %>">Register User</a>
     <a href="/management-console/chats" class="<%= activeTab === 'chats' ? 'active' : '' %>">Chats</a>
     <a href="/management-console/users" class="<%= activeTab === 'users' ? 'active' : '' %>">User Management</a>
-    <a href="#" class="logout-button" id="logout-button">Log Out</a>
+    
+    <div class="dropdown-container"> <!-- The FLM Dropdown -->
+        <div class="dropdown">
+            <button class="dropbtn">
+                <img src="/image-data/flm-green-logo.png" alt="Logo" class="logo">
+            </button>
+            <div class="dropdown-content">
+                <div id="userInfo" class="typewriter">User Info</div>
+                <a href="#" class="common-button" id="logoutOption">Logout</a>
+            </div>
+        </div>
+    </div> <!-- End FLM Dropdown -->
 </div>
 
 <script src="/javascript/management-sidebar-javascript.js"></script>
-
-

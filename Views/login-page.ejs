@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="/login-page-styling.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="/login-page-styling.css"> <!-- Make sure the path is correct -->
 </head>
 <body>
-  <div class="container">
-    <h1>Login</h1>
-    <form id="loginForm">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required>
-
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-
-      <button type="submit">Login</button>
-    </form>
-    <p><a href="/register" id="no-account">Don't have an account? Register here</a></p>
-  </div>
-  
-  <div id="spinner-container" style="display: none;">
-    <div id="spinner"></div>
-  </div>
-  
-
-  <!-- Popup HTML -->
-  <div id="popup" class="popup">
-    <div class="popup-content">
-      <span id="popup-close" class="popup-close">&times;</span>
-      <p id="popup-message">Invalid credentials. Please try again.</p>
-      <button id="popup-ok" class="popup-ok">Okay</button>
+    <div class="container">
+        <div class="illustration">
+            <!-- <img src="image.png" alt="Illustration" /> -->
+        </div>
+        <div class="login-section">
+            <div class="form-container">
+                <!-- <p class="register-link">Not a member? <a href="#">Register now</a></p> -->
+                <h2>FOODLOVER'S MARKET AI</h2>
+                <p>Your AI assistant</p>
+                <form id="loginForm"> <!-- Added ID to the form -->
+                    <input type="text" placeholder="Enter username" name="username" required>
+                    <input type="password" placeholder="Password" name="password" required>
+                    <div class="password-options">
+                        <!-- <a href="#" class="recovery-password">Recovery Password</a> -->
+                    </div>
+                    <button type="submit" class="sign-in-btn">Sign In</button>
+                    <div id="error-message" class="error-message"></div> <!-- Error message placeholder -->
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script src="/javascript/login-page-javascript.js"></script>
+    <!-- Spinner Container -->
+    <div id="spinner-container">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="/javascript/login-page-javascript.js"></script> <!-- Make sure the path is correct -->
 </body>
 </html>

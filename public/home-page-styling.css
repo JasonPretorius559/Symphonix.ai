@@ -1,81 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Beginner:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Beginner:wght@400;700&family=Inter:wght@400;600;700;800&display=swap');
 
-/* Apply Rubik font to the entire page */
+/* Global Styles */
 body {
     margin: 0;
     font-family: 'Rubik', sans-serif;
-    background-color: #f4f4f4;
+    background-color: #eef2f3;
     height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-.navbar {
-    background-color: #01713F;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    height: 60px;
-}
-
-.navbar .logo {
-    position: absolute;
-    left: 7px;
-    height: 60px; /* Adjust as needed */
-    cursor: pointer;
-}
-
-.navbar h1 {
-    margin: 0;
-    font-size: 30px;
-    text-align: center;
-    flex: 1; /* This will center the title */
-    font-family: "Inter", sans-serif;
-}
-
+/* Chat Container */
 .chat-container {
     display: flex;
     flex: 1;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Sidebar Styles */
 .chat-sidebar {
-    width: 300px;
+    width: 300px; /* Width of the sidebar */
+    height: 100%; /* Full height */
     background-color: #2c2c2c;
     color: white;
     display: flex;
     flex-direction: column;
-    padding: 20px;
     box-sizing: border-box;
     overflow: hidden;
+    border-radius: 0; /* Set border-radius to 0 for square edges */
 }
 
 .chat-sidebar h2 {
-    margin: 0;
-    padding-bottom: 10px;
-    flex-shrink: 0;
+    margin: 0 0 10px 0; /* Adjusted margin */
+    font-size: 30px; /* Font size */
+    font-weight: 500;
+    padding: 10px 0px 0px 10px;
 }
 
 #newChatButton {
-    margin-bottom: 10px;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    background-color: #01713F;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    flex-shrink: 0;
+    margin: 0px 5px 10px 5px; /* Space below the button */
+    padding: 10px 20px; /* Adjust padding for a more spacious feel */
+    border: none; /* Remove default border */
+    background-color: #006938; /* Bright green background */
+    color: white; /* White text color for contrast */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Adjusted font size for better readability */
+    border-radius: 8px; /* Slightly more rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
 }
 
 #newChatButton:hover {
-    background-color: #45a049;
+    background-color: #00552d; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
 }
 
 #chatList {
@@ -88,29 +67,33 @@ body {
 
 .chat-item {
     padding: 10px;
-    background-color: #3a3a3a;
-    margin-bottom: 10px;
+    background-color: #2c2c2c;
+    margin-bottom: 1px;
     cursor: pointer;
-    border-radius: 5px;
-    position: relative; /* Required for positioning the delete button */
     display: flex;
     align-items: center;
     justify-content: space-between;
+    transition: background-color 0.3s;
+    font-size: 16px;
 }
 
 .chat-item:hover {
-    background-color: #01713F;
+    background-color: #4d4d4d;
 }
 
 .chat-item.active {
-    background-color: #4CAF50;
+    color: #00552d;
+    font-weight: 500;
 }
 
+/* Main Chat Area */
 .chat-main-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     background-color: white;
+    border-top-right-radius: 12px; /* Keep rounded edges for main chat area */
+    border-bottom-right-radius: 12px;
     overflow: hidden;
 }
 
@@ -121,80 +104,167 @@ body {
 }
 
 .messages {
-    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
 }
 
 .message {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    max-width: 60%;
-    word-break: normal;        /* Only break at normal word breaks */
-    overflow-wrap: normal;     /* Prevent arbitrary word breaks */
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    max-width: 75%;
+    opacity: 0; /* Start invisible */
+    animation: fadeIn 0.5s ease-in-out forwards; /* Fade-in animation */
 }
 
+/* User Message Styles */
 .message.user {
-    background-color: #01713F;
+    background-color: #006938;
     align-self: flex-end;
-    border-radius: 10px 10px 0 10px;
+    border-radius: 8px 8px 0 8px;
     color: white;
 }
 
+/* Bot Message Styles */
 .message.bot {
-    background-color: #000000; /* Change to black */
+    background-color: #343a40; /* Change background to dark gray */
     align-self: flex-start;
-    border-radius: 10px 10px 0 10px;
-    color: white; /* Keep the text color white */
+    border-radius: 8px 8px 0 8px;
+    color: white;
 }
 
-.chat-footer {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #e0e0e0;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
+/* Fade-in Animation Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+/* Input Container */
 .input-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    background-color: #e0e0e0;
-    border-radius: 30px;
-    padding: 5px;
-    box-sizing: border-box;
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center items vertically */
+    width: 90%; /* Full width with responsiveness */
+    max-width: 600px; /* Max width to maintain usability */
+    margin: 20px auto; /* Centered with vertical spacing */
+    background-color: #f0f0f0; /* Light background for contrast */
+    border-radius: 30px; /* Rounded corners */
+    padding: 10px; /* Padding inside the container */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
 }
 
+/* Message Input */
 #messageInput {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 30px 0 0 30px;
-    outline: none;
-    background-color: #ffffff;
+    flex: 1; /* Allow input to grow */
+    padding: 12px; /* Padding for spacing */
+    font-size: 16px; /* Font size for readability */
+    line-height: 1.5; /* Line height for text spacing */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 20px 0 0 20px; /* Rounded corners on the left */
+    background-color: #ffffff; /* White background */
+    resize: none; /* Prevent manual resizing */
+    min-height: 50px; /* Minimum height for the input */
+    max-height: 200px; /* Maximum height to prevent it from getting too large */
+    overflow-y: auto; /* Allow scrolling for overflow */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition effects */
+}
+
+/* Placeholder Style */
+#messageInput::placeholder {
+    text-align: left; /* Align placeholder text to the left */
+    opacity: 0.7; /* Optional: reduce opacity for placeholder text */
+}
+
+/* Focus State */
+#messageInput:focus {
+    border-color: #006938; /* Change border color on focus */
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); /* Light green shadow for focus */
 }
 
 #sendButton {
-    padding: 10px 20px;
-    border: none;
-    background-color: #01713F;
-    color: white;
-    cursor: pointer;
-    border-radius: 0 30px 30px 0;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 0; /* Remove padding for uniformity */
+    border: none; /* Remove default border */
+    background-color: #006938; /* Green background */
+    color: white; /* White text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 50%; /* Fully rounded button */
+    font-size: 16px; /* Adjusted font size for better readability */
+    height: 50px; /* Set button height */
+    width: 50px; /* Set button width for a perfect circle */
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s; /* Smooth transition */
+    display: flex; /* Use flexbox to center text and icon */
+    align-items: center; /* Center text and icon vertically */
+    justify-content: center; /* Center text and icon horizontally */
+    margin-left: 5px; /* Space between input and button */
+    margin-right: 5px;
+    background-image: url('/image-data/send-button-icon.svg'); /* Set SVG as background image */
+    background-size: 16px 16px; /* Size of the SVG */
+    background-repeat: no-repeat; /* Prevent repeat of the SVG */
+    background-position: center; /* Center the SVG in the button */
+    
 }
 
+/* Send Button Hover State */
 #sendButton:hover {
-    background-color: #45a049;
+    background-color: #00552d; /* Darker green on hover */
+    transform: scale(1.05); /* Slight scale-up effect on hover */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Shadow on hover */
 }
 
+/* Send Button Active State */
+#sendButton:active {
+    transform: scale(0.95); /* Scale down effect on click */
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2); /* Reduced shadow on click */
+}
+
+/* Send Button Disabled State */
+#sendButton:disabled {
+    background-color: #95a5a6; /* Gray background when disabled */
+    cursor: not-allowed; /* Not-allowed cursor */
+    opacity: 0.7; /* Slightly faded appearance */
+}
+
+
+/* Custom Scrollbar Styles */
+.chat-sidebar #chatList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-sidebar #chatList::-webkit-scrollbar-thumb {
+    background-color: #006938;
+    border-radius: 10px;
+}
+
+.chat-sidebar #chatList::-webkit-scrollbar-thumb:hover {
+    background-color: #00552d;
+}
+
+/* Delete Button Styles */
+.delete-chat {
+    background-color: transparent; /* No background */
+    border: none; /* Remove border */
+    padding: 0;
+    width: 24px; /* Set a fixed size for the button */
+    height: 24px;
+    background-image: url('/image-data/sidebar-delete-icon.svg'); /* Reference your SVG */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    filter: invert(27%) sepia(79%) saturate(6325%) hue-rotate(352deg) brightness(103%) contrast(104%); /* Red filter */
+}
+
+/* Optional: Hover effect */
+.delete-chat:hover {
+    opacity: 0.8; /* Slight opacity change on hover */
+}
+
+/* Media Queries */
 @media (max-width: 768px) {
     .chat-sidebar {
         width: 100%;
@@ -202,217 +272,11 @@ body {
         flex-direction: row;
         overflow-x: auto;
         overflow-y: hidden;
-        flex-shrink: 0;
-    }
-
-    .chat-sidebar h2 {
-        display: none;
-    }
-
-    #newChatButton {
-        margin: 0 20px 0 0;
-        flex: 0 0 auto;
-    }
-
-    #chatList {
-        display: flex;
-        flex-direction: row;
-        width: auto;
-        flex: 1;
-        margin: 0;
-        padding: 0;
-    }
-
-    .chat-item {
-        padding: 10px 40px 10px 10px; /* Adjust padding for delete button */
     }
 
     .chat-main-container {
         height: calc(100vh - 150px);
     }
-}
-
-/* Custom scrollbar for WebKit browsers */
-.chat-sidebar #chatList::-webkit-scrollbar {
-    width: 6px; /* Make the scrollbar thinner */
-}
-
-.chat-sidebar #chatList::-webkit-scrollbar-track {
-    background-color: #01713F; /* Match the sidebar background */
-}
-
-.chat-sidebar #chatList::-webkit-scrollbar-thumb {
-    background-color: #01713F; /* A green color to match the theme */
-    border-radius: 10px; /* Round the scrollbar edges */
-}
-
-.chat-sidebar #chatList::-webkit-scrollbar-thumb:hover {
-    background-color: #01713F; /* Darken on hover */
-}
-
-/* Custom scrollbar for Firefox */
-.chat-sidebar #chatList {
-    scrollbar-width: thin; /* Make the scrollbar thinner */
-    scrollbar-color: #01713F #2c2c2c; /* Set scrollbar thumb and track color */
-}
-
-.delete-chat {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.delete-chat:hover {
-    background-color: #c0392b;
-}
-
-/* Add CSS for dropdown menu */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0; /* Align dropdown to the right */
-    top: 100%;
-    background-color: #4CAF50;
-    border-radius: 8px;
-    width: 500px; /* Set width */
-    height: 500px; /* Set height */
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    padding: 0; /* Remove padding to avoid extra space */
-    margin: 0; /* Ensure no extra margin */
-}
-
-.dropdown-content.show {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-    margin-top: 16px; /* Ensure there's space between dropdown and the button */
-}
-
-.dropdown-content a {
-    color: white; /* Adjust text color to match the background */
-    padding: 12px 16px; /* Adjust padding as needed */
-    text-decoration: none;
-    display: block;
-    border-bottom: 1px solid #4CAF50; /* Optional: border to separate items */
-    font-size: 16px; /* Adjust font size to match button */
-    font-family: "Inter", sans-serif;
-    border-radius: 8px; /* Rounded corners to match button */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
-}
-
-/* Remove the border from the last item */
-.dropdown-content a:last-child {
-    border-bottom: none;
-}
-
-/* Hover effect for dropdown links */
-.dropdown-content a:hover {
-    background-color: #005C3C; /* Darker green on hover */
-    border-radius: 8px; /* Ensure rounded corners on hover */
-}
-
-
-.dropdown .dropbtn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-.dropdown img {
-    width: 40px; /* Adjust the size of the image */
-    height: 40px; /* Adjust the size of the image */
-    border-radius: 50%;
-    border: 2px solid #fff; /* Add a border to the image for better visibility */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for a lifted effect */
-}
-
-/* Admin Tools Button */
-#adminToolsButton {
-    background-color: #4CAF50; /* Match the dropdown background color */
-    color: white;
-    border: none;
-    padding: 12px 16px;
-    font-size: 16px; /* Smaller font size to fit dropdown */
-    font-family: "Inter", sans-serif;
-    cursor: pointer;
-    border-radius: 8px; /* Match dropdown border radius */
-    margin: 8px; /* Space around the button */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for a lifted effect */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
-    width: calc(100% - 16px); /* Full width minus padding */
-    text-align: center; /* Center the text */
-}
-
-#adminToolsButton:hover {
-    background-color: #005C3C; /* Match the dropdown hover color */
-    border-radius: 8px;
-}
-
-
-
-#userInfo {
-    color: rgb(255, 255, 255); /* Adjust text color */
-    
-    font-size: 20px; /* Increase font size */
-    font-weight: bold; /* Make the font bold */
-    background-color: #000000; /* Set background color */
-    height: 10%; /* Set height */
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    /* Flexbox settings to center content */
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    text-align: center; /* Ensure text is centered within the element */
-    font-size: 25px;
-    font-family: "Inter", sans-serif;
-}
-
-.spinner {
-    border: 4px solid #f3f3f3; /* Light grey */
-    border-top: 4px solid #01713F; /* Green */
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Modify the #sendButton styling to handle disabled state */
-#sendButton:disabled {
-    background-color: #95a5a6; /* Gray background when disabled */
-    cursor: not-allowed;
-}
-
-/* Spinner Styles */
-.message-spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top: 4px solid #01713F;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
 }
 
 /* Spinner Animation */
@@ -421,15 +285,3 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-#spinnerContainer {
-    position: fixed; /* Position it fixed to avoid affecting other layout elements */
-    top: 0; /* Align to the top of the viewport */
-    left: 0; /* Align to the left of the viewport */
-    width: 100%; /* Cover the full viewport width */
-    height: 100%; /* Cover the full viewport height */
-    display: none; /* Hidden by default */
-    justify-content: center; /* Center spinner horizontally */
-    align-items: center; /* Center spinner vertically */
-    
-    z-index: 9999; /* Ensure it's above other content */
-}

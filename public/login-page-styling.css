@@ -1,176 +1,154 @@
-body {
-  font-family: Arial, sans-serif;
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f5f5;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: rgb(1,113,63); /* Dark background color */
-}
-
-body::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('/image-data/flm-background.jpg') no-repeat center center fixed;
-  background-size: 80%; /* Adjust the size as needed */
-  filter: blur(8px); /* Adjust the blur intensity */
-  z-index: -1; /* Place the background behind the content */
 }
 
 .container {
   display: flex;
+  width: 60%;
+  height: 80vh;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.illustration {
+  flex: 1;
+  background: url('/image-data/login-page-background.jpg') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.illustration img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  padding: 30px;
+}
+
+.login-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(145deg, #e2e6ee, #ffffff);
+  padding: 20px;
+}
+
+.form-container {
+  text-align: center;
+  max-width: 80%;
+  width: 100%;
+}
+
+.register-link {
+  text-align: right;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.register-link a {
+  color: #00aaff;
+  text-decoration: none;
+}
+
+h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+p {
+  font-size: 16px;
+  color: #666;
+}
+
+form {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative; /* Ensure it stays on top of the blurred background */
 }
 
-  h1 {
-    margin-bottom: 20px;
-    color: #ffffff; /* White color for headings */
-  }
-
-  form {
-    background-color: white;
-    padding: 30px; /* Increased padding */
-    border-radius: 10px; /* More rounded corners */
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Slightly larger shadow */
-    width: 400px; /* Fixed width for the form */
-  }
-
-  label {
-    display: block;
-    margin: 15px 0 5px;
-    color: #0B0C0D; /* Dark color for text */
-  }
-
-  input {
-    width: calc(100% - 20px); /* Adjust width to account for padding */
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-
-  button {
-    padding: 12px 25px; /* Larger button */
-    background-color: #00723F; /* Green button color */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #005b32; /* Darker green on hover */
-  }
-
-  /* Style for the "Don't have an account?" link */
-#no-account {
-  color: #ffffff; /* Green color to match the button */
-  text-decoration: none; /* Remove underline */
-  font-weight: bold; /* Make text bold */
-}
-
-#no-account:hover {
-  text-decoration: underline; /* Add underline on hover */
-}
-
-
-/* Popup container */
-.popup {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1000; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
-}
-
-/* Popup content */
-.popup-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-  max-width: 500px;
-  border-radius: 10px;
-  position: relative; /* For positioning the close button */
-}
-
-/* The close button */
-.popup-close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.popup-close:hover,
-.popup-close:focus {
-  color: black;
-  text-decoration: none;
-}
-
-/* The okay button */
-.popup-ok {
-  background-color: #00723F; /* Green color */
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin-top: 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.popup-ok:hover {
-  background-color: #005d2a; /* Darker green on hover */
-}
-
-/* Container for the spinner */
-#spinner-container {
-  display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  position: fixed;
-  top: 0;
-  left: 0;
+form input {
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
-  z-index: 1000; /* Ensure it's on top */
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  font-size: 16px;
+  color: #333;
 }
 
-/* Updated spinner styles */
-#spinner {
-  border: 12px solid rgba(0, 0, 0, 0.1); /* Light border */
-  border-top: 12px solid #00723F; /* Green border */
-  border-radius: 50%;
-  width: 80px; /* Increased width */
-  height: 80px; /* Increased height */
-  animation: spin 1s linear infinite;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Larger shadow */
+form input:focus {
+  outline: none;
+  border-color: #00aaff;
 }
 
-/* Animation for spinner */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.password-options {
+  width: 100%;
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.recovery-password {
+  font-size: 14px;
+  color: #00aaff;
+  text-decoration: none;
+}
+
+.sign-in-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: #006938;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.sign-in-btn:hover {
+  background-color: #00552d;
+}
+
+.social-login {
+  margin-top: 20px;
+}
+
+.social-login p {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.social-icons a {
+  margin: 0 10px;
+}
+
+.social-icons img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+
+/* Error message styling */
+.error-message {
+  margin-top: 10px;
+  color: red;
+  font-size: 14px;
+  display: none; /* Hidden by default */
 }

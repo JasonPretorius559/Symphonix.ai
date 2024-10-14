@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getChats, getMessages, sendMessage, deleteChat } = require('./homeController'); // Adjust the path as necessary
+const { getChats, getMessages, InsertMessage, deleteChat } = require('./homeController'); // Adjust the path as necessary
 
 // Get chats
 router.get('/', async (req, res) => {
@@ -48,7 +48,7 @@ router.get('/messages/:chatId?', async (req, res) => {
 
 
 
-router.post('/send-message', sendMessage);
+router.post('/insert-message', InsertMessage);
 
 router.post('/delete-chat', deleteChat);
 
