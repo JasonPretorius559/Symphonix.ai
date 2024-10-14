@@ -23,7 +23,7 @@ body {
 .sidebar {
     height: 100vh;
     width: 250px;
-    background-color: #00733d; /* Green sidebar background */
+    background-color: #006938; /* Green sidebar background */
     position: fixed;
     top: 0;
     left: 0;
@@ -73,7 +73,36 @@ body {
     border-radius: 5px;
     text-decoration: none;
 }
+/* Force dropdown option background to green */
+select {
+    background-color: #006938; /* Default background for dropdown */
+    color: #fff; /* Text color */
+}
 
+/* Change the default blue highlight for selected and hovered options */
+select option:checked, select option:hover {
+    background-color: #004d2e; /* Dark green for selected and hovered */
+    color: #fff; /* White text for better contrast */
+}
+
+/* Apply the same green to active dropdowns */
+select:focus {
+    background-color: #004d2e; /* Darker green on focus */
+    color: #fff;
+    outline: none; /* Remove blue border from focus */
+    box-shadow: 0 0 5px #004d2e; /* Optional: Add shadow for focus state */
+}
+/* Custom style for dropdown options */
+select option:hover {
+    background-color: #1e471a; /* Dark green for hover */
+    color: #fff;
+}
+
+/* Active dropdown option style */
+select option:checked {
+    background-color: #004d2e; /* Darker green for selected/active */
+    color: #fff;
+}
 .sidebar .logout-button:hover {
     background-color: #004d2e; /* Darker green on hover */
 }
@@ -101,7 +130,7 @@ body {
 }
 
 .widget:hover {
-    background-color: #51ff01;
+    background-color: #ececec;
     transform: scale(1.05); /* Slightly scale up the widget for added effect */
 }
 
@@ -360,7 +389,7 @@ section {
     left: 50%;
     top: -100px; /* Initially hidden above the screen */
     transform: translateX(-50%);
-    background-color: #4caf50; /* Green background */
+    background-color: #006938; /* Green background */
     color: white;
     padding: 20px;
     border-radius: 5px;
@@ -397,7 +426,7 @@ section {
 }
 
 .users-table th {
-    background-color: #4CAF50;
+    background-color: #006938;
     color: white;
 }
 
@@ -406,7 +435,7 @@ section {
 }
 
 .edit-btn, .delete-btn {
-    background-color: #4CAF50;
+    background-color: #006938;
     color: white;
     padding: 5px 10px;
     border: none;
@@ -415,5 +444,5 @@ section {
 }
 
 .edit-btn:hover, .delete-btn:hover {
-    background-color: #45a049;
+    background-color: #004d2e;
 }
