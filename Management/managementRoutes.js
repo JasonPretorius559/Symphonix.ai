@@ -1,6 +1,9 @@
 const express = require('express');
 const managementController = require('./managementController'); // Adjust the path
-const { Parser } = require('json2csv'); 
+const { Parser } = require('json2csv');
+const axios = require('axios');
+
+
 
 const router = express.Router();
 //==========================================================================//
@@ -114,6 +117,18 @@ router.post('/refresh-sessions', async (req, res) => {
 });
 
 
+
+router.post('/check-ollama', async (req, res) => {
+    try {
+        const response = await axios.get('http://localhost:11434/');
+        
+        // If Ollama is running, send the response
+        res.json({ status: 'ok', message: 'Ollama is running', data: response.data });
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        return res.status(500).json({ status: 'error', message: 'Ollama is not running' });
+    }
+});
 
 
 

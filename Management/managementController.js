@@ -45,15 +45,16 @@ const getSessionData = async () => {
             SELECT 
                 users.username AS UserName, 
                 sessions.userid AS UserID,
-                (SELECT COUNT(*) FROM chats WHERE chats.userid = sessions.userid) AS OpenChats,
+                (SELECT COUNT(*) FROM chats WHERE chats.userid = sessions.userid AND delete_status = 0) AS OpenChats,
                 sessions.last_interaction AS LastSession,
                 FROM_UNIXTIME(sessions.expires) AS ExpiryTime,
                 sessions.user_ip_address AS IPAddress
             FROM sessions
             JOIN users ON sessions.userid = users.userid
             WHERE sessions.expires > UNIX_TIMESTAMP()  -- Only include active sessions
-              AND sessions.created_at <= NOW()           -- Ensure sessions have been created
-            ORDER BY LastSession DESC
+            AND sessions.created_at <= NOW()           -- Ensure sessions have been created
+            ORDER BY LastSession DESC;
+
         `);
         return rows; // Return the array of session data
     } catch (error) {
