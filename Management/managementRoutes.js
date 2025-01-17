@@ -109,6 +109,10 @@ router.post('/refresh-sessions', async (req, res) => {
     try {
         const totalSessions = await managementController.getTotalSessions();
         const sessionData = await managementController.getSessionData(); // Fetch session data
+
+        // Log the session data to ensure the 'created_at' field is present
+        // console.log('Session Data:', sessionData);
+
         res.json({ totalSessions, sessionData }); // Send both totalSessions and sessionData
     } catch (error) {
         console.error("Error fetching updated sessions:", error.message);
@@ -118,17 +122,37 @@ router.post('/refresh-sessions', async (req, res) => {
 
 
 
+
 router.post('/check-ollama', async (req, res) => {
     try {
         const response = await axios.get('http://localhost:11434/');
-        
+
         // If Ollama is running, send the response
         res.json({ status: 'ok', message: 'Ollama is running', data: response.data });
     } catch (error) {
-        console.error(`Error: ${error.message}`);
-        return res.status(500).json({ status: 'error', message: 'Ollama is not running' });
+        console.error("Full Error Object:", error); // Log the entire error object
+
+        let errorMessage = 'An unknown error occurred while trying to connect to Ollama.';
+
+        // Check for specific error types
+        if (error.response) {
+            // Server responded with a non-2xx status code
+            console.error("Response Error:", error.response); // Log the response error
+            errorMessage = `Ollama server returned an error: ${error.response.status} - ${error.response.statusText}`;
+        } else if (error.request) {
+            // No response received
+            console.error("Request Error:", error.request); // Log the request error
+            errorMessage = 'No response received from Ollama. Please check if Ollama is running on the specified port.';
+        } else {
+            // General error
+            console.error("General Error:", error.message); // Log the general error message
+            errorMessage = `Error while setting up the request: ${error.message}`;
+        }
+
+        return res.status(500).json({ status: 'error', message: errorMessage });
     }
 });
+
 
 
 

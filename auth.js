@@ -7,7 +7,7 @@ const sessionStore = new MySQLStore({
   expiration: 24 * 60 * 60 * 1000, // Session expiration time (1 day in milliseconds)
   endConnectionOnClose: false,     // Keep the connection alive
   createDatabaseTable: true        // Automatically create the sessions table if it doesn't exist
-}, connection); // Use the MySQL connection pool directly
+}, connection);
 
 // Middleware configuration for sessions with MySQL store
 const sessionMiddleware = session({
@@ -21,6 +21,7 @@ const sessionMiddleware = session({
   }
 });
 
+// Middleware to capture and update the user's IP address in the session
 const captureIpMiddleware = async (req, res, next) => {
   let userIp = req.ip || req.connection.remoteAddress;
 
@@ -29,34 +30,29 @@ const captureIpMiddleware = async (req, res, next) => {
     userIp = userIp.split('::ffff:')[1];
   }
 
-  console.log('Captured IP:', userIp); // Debug IP capture
+  // console.log('Captured IP:', userIp); // Debug IP capture
 
-  if (req.sessionID && req.session.user && req.session.user.id) { // Assuming req.session.user.id holds the user ID
+  if (req.sessionID && req.session.user?.id) { // Check session and user ID safely
     const userId = req.session.user.id; // Get the user ID from the session
-    console.log('Session ID:', req.sessionID); // Debug session ID
-    console.log('User ID:', userId); // Debug user ID
-
-    // Get the current time + 24 hours in UNIX timestamp (seconds)
-    const currentTime = Math.floor(Date.now() / 1000);
-    const expirationTime = currentTime + (24 * 60 * 60); // 24 hours in seconds
+    // console.log('Session ID:', req.sessionID); // Debug session ID
+    // console.log('User ID:', userId); // Debug user ID
 
     try {
       const conn = await connection.getConnection();
       await conn.execute(
-        'UPDATE sessions SET user_ip_address = ?, userid = ?, expires = ? WHERE session_id = ?',
-        [userIp, userId, expirationTime, req.sessionID]
+        'UPDATE sessions SET user_ip_address = ?, userid = ? WHERE session_id = ?',
+        [userIp, userId, req.sessionID]
       );
       conn.release();
     } catch (error) {
-      console.error('Error updating session with IP address, user ID, and expiration time:', error);
+      console.error('Error updating session with IP address and user ID:', error);
     }
   }
 
   next();
 };
 
-
-// Middleware to check authentication
+// Middleware to check if the user is authenticated
 const Authenticated = (req, res, next) => {
   if (req.session.user) {
     return next(); // User is authenticated
@@ -67,7 +63,7 @@ const Authenticated = (req, res, next) => {
 
 // Middleware to check if the user is an admin
 const admin = (req, res, next) => {
-  if (req.session.user && req.session.user.role === 1) {
+  if (req.session.user?.role === 1) {
     return next(); // User is admin
   } else {
     res.redirect('/home'); // Redirect if not admin
@@ -79,41 +75,21 @@ const getUserIp = async (req) => {
   try {
     const conn = await connection.getConnection();
     const [rows] = await conn.execute(
-      'SELECT ip_address FROM sessions WHERE session_id = ?',
+      'SELECT user_ip_address FROM sessions WHERE session_id = ?',
       [req.sessionID]
     );
     conn.release();
-    return rows.length ? rows[0].ip_address : null;
+    return rows.length ? rows[0].user_ip_address : null;
   } catch (error) {
     console.error('Error fetching IP address:', error);
     return null;
   }
 };
 
-
-// Middleware to update last interaction timestamp
-const updateLastInteractionMiddleware = async (req, res, next) => {
-  if (req.sessionID) {
-      try {
-          const conn = await connection.getConnection();
-          await conn.execute(
-              'UPDATE sessions SET last_interaction = NOW() WHERE session_id = ?',
-              [req.sessionID]
-          );
-          conn.release();
-      } catch (error) {
-          console.error('Error updating last interaction:', error);
-      }
-  }
-  next();
-};
-
-
 module.exports = {
   sessionMiddleware,
   captureIpMiddleware,
   Authenticated,
   admin,
-  getUserIp,
-  updateLastInteractionMiddleware,
+  getUserIp
 };

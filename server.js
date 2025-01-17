@@ -15,14 +15,14 @@ const app = express();
 // Use session middleware
 app.use(sessionMiddleware);
 app.use(captureIpMiddleware);
-app.use(updateLastInteractionMiddleware);
+// app.use(updateLastInteractionMiddleware);
 
 
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
 
 // Set the views directory
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'Views'));
 
 // Serve static files (e.g., CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));

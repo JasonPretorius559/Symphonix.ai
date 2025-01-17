@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hours = d.getHours().toString().padStart(2, '0');
         const minutes = d.getMinutes().toString().padStart(2, '0');
         const seconds = d.getSeconds().toString().padStart(2, '0');
-
+    
         return `${year}/${month}/${day}, ${hours}:${minutes}:${seconds}`;
     };
 
@@ -46,45 +46,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Function to fetch session data
-    const populateTable = async () => {
-        try {
-            const response = await fetch('/management-console/refresh-sessions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            });
+// Function to fetch session data
+// Function to fetch session data
+// Function to fetch session data
+const populateTable = async () => {
+    try {
+        const response = await fetch('/management-console/refresh-sessions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-
-            const data = await response.json();
-
-            if (data.sessionData && Array.isArray(data.sessionData)) {
-                tableBody.innerHTML = '';
-
-                data.sessionData.forEach(session => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${session.UserName}</td>
-                        <td>${session.UserID}</td>
-                        <td>${session.OpenChats}</td>
-                        <td>${formatDate(session.LastSession)}</td>
-                        <td>${formatDate(session.ExpiryTime)}</td>
-                        <td>${session.IPAddress}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } else {
-                console.error('Unexpected data format:', data);
-            }
-        } catch (error) {
-            console.error('Error fetching session data:', error);
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
         }
-    };
+
+        const data = await response.json();
+
+        if (data.sessionData && Array.isArray(data.sessionData)) {
+            tableBody.innerHTML = '';
+
+            data.sessionData.forEach(session => {
+                // Format the 'CreatedAt' field using the formatDate function
+                const createdAtFormatted = formatDate(session.CreatedAt);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.UserName}</td>
+                    <td>${session.UserID}</td>
+                    <td>${session.OpenChats}</td>
+                    <td>${session.IPAddress}</td>
+                    <td>${createdAtFormatted}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            console.error('Unexpected data format:', data);
+        }
+    } catch (error) {
+        console.error('Error fetching session data:', error);
+    }
+};
+
+
 
 // Function to fetch Ollama status and update the widget
 const fetchOllamaStatus = async () => {

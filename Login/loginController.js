@@ -32,7 +32,7 @@ const loginUser = async (req, res) => {
     if (isMatch) {
       // Create a session and include the user ID
       req.session.user = { id: user.userid, username: user.username, role: user.access_role };
-      console.log('Session after login:', req.session); // Debug session
+      // console.log('Session after login:', req.session); // Debug session
       return res.json({ success: true }); // Return JSON on success
     } else {
       return res.status(400).json({ error: 'Invalid username or password' });

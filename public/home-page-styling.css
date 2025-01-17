@@ -145,7 +145,7 @@ body {
     }
 }
 
-/* Input Container */
+/* Message Input Container */
 .input-container {
     display: flex; /* Use flexbox for layout */
     align-items: center; /* Center items vertically */
@@ -158,34 +158,94 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
 }
 
-/* Message Input */
+/* Message Input (Text Area) */
 #messageInput {
-    flex: 1; /* Allow input to grow */
-    padding: 12px; /* Padding for spacing */
+    flex: 1; /* Allow the textarea to grow */
+    padding: 12px 15px; /* Padding for spacing */
+    padding-right: 20px; /* Additional right padding to accommodate the scrollbar */
     font-size: 16px; /* Font size for readability */
     line-height: 1.5; /* Line height for text spacing */
-    border: 1px solid #ccc; /* Light gray border */
-    border-radius: 20px 0 0 20px; /* Rounded corners on the left */
-    background-color: #ffffff; /* White background */
+    border: none; /* No border */
+    border-radius: 20px; /* Rounded corners */
+    background-color: #f0f0f0; /* White background */
     resize: none; /* Prevent manual resizing */
     min-height: 50px; /* Minimum height for the input */
     max-height: 200px; /* Maximum height to prevent it from getting too large */
     overflow-y: auto; /* Allow scrolling for overflow */
     transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition effects */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    position: relative; /* To properly align the scrollbar */
 }
 
-/* Placeholder Style */
-#messageInput::placeholder {
-    text-align: left; /* Align placeholder text to the left */
-    opacity: 0.7; /* Optional: reduce opacity for placeholder text */
+
+
+/* Button (Send) */
+#sendButton {
+    background-color: #4CAF50; /* Green background */
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 50%;
+    margin-left: 10px; /* Space between textarea and button */
+    height: 50px;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+#sendButton:hover {
+    background-color: #45a049;
+}
+
+/* Spinner (while sending) */
+#sendSpinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+}
+
+/* Custom Scrollbar */
+#messageInput::-webkit-scrollbar {
+    width: 6px; /* Set the width of the scrollbar */
+    max-height: 160px; /* Optional: if you want a custom height for horizontal scrollbar */
+}
+
+#messageInput::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#messageInput::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+    border: 2px solid #f1f1f1;
+    min-height: 20px; /* Shorter height for the scrollbar thumb */
+}
+
+#messageInput::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+#messageInput::-webkit-scrollbar-thumb:active {
+    background: #808080;
+}
+
+
+
 
 /* Focus State */
 #messageInput:focus {
-    border-color: #006938; /* Change border color on focus */
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); /* Light green shadow for focus */
+    border: none; /* Change border color on focus */
+
+    outline: none; /* Remove outline on focus */
 }
 
+/* Send Button Styles */
 #sendButton {
     padding: 0; /* Remove padding for uniformity */
     border: none; /* Remove default border */
@@ -201,12 +261,10 @@ body {
     align-items: center; /* Center text and icon vertically */
     justify-content: center; /* Center text and icon horizontally */
     margin-left: 5px; /* Space between input and button */
-    margin-right: 5px;
     background-image: url('/image-data/send-button-icon.svg'); /* Set SVG as background image */
     background-size: 16px 16px; /* Size of the SVG */
     background-repeat: no-repeat; /* Prevent repeat of the SVG */
     background-position: center; /* Center the SVG in the button */
-    
 }
 
 /* Send Button Hover State */
@@ -228,7 +286,6 @@ body {
     cursor: not-allowed; /* Not-allowed cursor */
     opacity: 0.7; /* Slightly faded appearance */
 }
-
 
 /* Custom Scrollbar Styles */
 .chat-sidebar #chatList::-webkit-scrollbar {
