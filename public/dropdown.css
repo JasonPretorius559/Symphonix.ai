@@ -13,6 +13,7 @@
     background: none; /* Remove default button styling */
     border: none; /* Remove border */
     cursor: pointer; /* Pointer on hover */
+    background-color: none;
 }
 
 /* Spin animation for the logo */
@@ -30,18 +31,18 @@
     width: 40px; /* Adjust size as needed */
     height: auto; /* Maintain aspect ratio */
     border-radius: 50%; /* Makes the logo circular */
-    border: 2px solid #4CAF50; /* Optional: Add a border color */
+   
     padding: 5px; /* Optional: Padding for spacing between border and logo */
-    background-color: white; /* Optional: Background color for contrast */
+    
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for depth */
     margin-right: 10px; /* Space between logo and dropdown */
     transition: transform 0.5s; /* Smooth transition for spinning */
 }
 
-
 /* Dropdown - Allow Content to Open Upwards */
 .dropdown {
-    position: relative; /* Allows dropdown-content to be positioned relative to this element */
+    position: fixed; /* Allows dropdown-content to be positioned relative to this element */
+    bottom: 10px;
 }
 
 .dropdown-content {
@@ -50,7 +51,7 @@
     background-color: #fff; /* Background color for dropdown */
     min-width: 200px; /* Minimum width for dropdown */
     max-width: 250px; /* Set a maximum width for a longer dropdown */
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2); /* Shadow for dropdown */
+    
     z-index: 1; /* Ensure it appears above other elements */
     left: 0; /* Align with the left edge of the dropdown button */
     bottom: 100%; /* Position above the dropdown button */
@@ -98,4 +99,33 @@
 /* Common button styles (optional) */
 .common-button {
     display: none; /* Hide buttons since we want text */
+}
+
+/* Popup container */
+.popup {
+    position: fixed;
+    left: 50%;
+    top: -100px; /* Initially hidden above the screen */
+    transform: translateX(-50%);
+    background-color: #006938; /* Green background */
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
+    z-index: 9999;
+    opacity: 0; /* Initially invisible */
+    transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out; /* Slide and fade transition */
+}
+
+/* Show the popup */
+.show {
+    top: 20px; /* Slide into view */
+    opacity: 1; /* Fade in */
+}
+
+/* Hide the popup (Fade out) */
+.hide {
+    opacity: 0; /* Fade out */
 }

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const user = result.user;
                 const userInfoElement = document.getElementById('userInfo');
                 const logoutOption = document.getElementById('logoutOption');
+                const homeOption = document.getElementById('homeOption');
 
                 if (userInfoElement) {
                     userInfoElement.textContent = `${user.username}`;
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const dropdownContent = document.querySelector('.dropdown-content');
                         dropdownContent.insertBefore(adminButton, logoutOption); // Insert the button
                     }
+
                 }
             } else {
                 console.error('Failed to fetch user info:', result.error);
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Add click event listener to dropdown button to toggle the dropdown
+   ome // Add click event listener to dropdown button to toggle the dropdown
     const dropbtn = document.querySelector('.dropbtn');
     const dropdownContent = document.querySelector('.dropdown-content');
 
@@ -62,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Apply spin animation
             if (dropdownContent.classList.contains('active')) {
                 logo.style.animation = 'spin 0.5s forwards'; // Spin on open
-                triggerTypewriterEffect(dropdownContent); // Trigger typewriter effect when opened
             } else {
                 logo.style.animation = 'spin 0.5s reverse forwards'; // Spin on close
             }
@@ -75,32 +76,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeDropdown(); // Hide dropdown if clicking outside
         }
     });
-
-    function triggerTypewriterEffect(dropdown) {
-        const items = dropdown.querySelectorAll('div, span'); // Select dropdown items
-        items.forEach((item, index) => {
-            item.style.display = 'none'; // Hide items initially
-            setTimeout(() => {
-                createTypewriterEffect(item); // Create typewriter effect for each item
-            }, index * 300); // Delay each item by 300ms
-        });
-    }
-
-    function createTypewriterEffect(element) {
-        const text = element.textContent;
-        element.textContent = ''; // Clear text
-        let i = 0;
-
-        const interval = setInterval(() => {
-            if (i < text.length) {
-                element.textContent += text.charAt(i); // Add one character at a time
-                i++;
-            } else {
-                clearInterval(interval); // Clear interval when done
-                element.style.display = 'block'; // Display the item
-            }
-        }, 100); // Typewriter speed
-    }
 
     updateDropdownUserInfo();
 });

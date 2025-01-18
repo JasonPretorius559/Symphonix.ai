@@ -21,6 +21,17 @@ body {
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  
+  /* Animation properties */
+  opacity: 0; /* Start fully transparent */
+  animation: fadeIn 0.8s forwards; /* Apply fadeIn animation */
+}
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  to {
+    opacity: 1; /* End fully opaque */
+  }
 }
 
 .illustration {
@@ -143,7 +154,6 @@ form input:focus {
   height: 40px;
   object-fit: contain;
 }
-
 
 /* Error message styling */
 .error-message {

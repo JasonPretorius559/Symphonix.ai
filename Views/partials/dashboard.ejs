@@ -28,9 +28,8 @@
                     <th>User Name</th>
                     <th>User ID</th>
                     <th>Open Chats</th>
-                    <th>Last Interaction</th>
-                    <th>Expiry Time</th>
                     <th>IP Address</th>
+                    <th>Time created</th>
                 </tr>
             </thead>
             <tbody id="sessionsTableBody">
@@ -39,9 +38,8 @@
                         <td><%= session.UserName %></td>
                         <td><%= session.UserID %></td>
                         <td><%= session.OpenChats %></td>
-                        <td><%= new Date(session.LastSession).toLocaleString() %></td>
-                        <td><%= new Date(session.ExpiryTime).toLocaleString() %></td>
                         <td><%= session.IPAddress %></td>
+                        <td><%= session.createdAtFormatted %></td> <!-- Display the raw created_at date -->
                     </tr>
                 <% }); %>
             </tbody>

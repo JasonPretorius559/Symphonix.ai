@@ -23,7 +23,7 @@ body {
 .sidebar {
     height: 100vh;
     width: 250px;
-    background-color: #006938; /* Green sidebar background */
+    background-color: #00733d; /* Green sidebar background */
     position: fixed;
     top: 0;
     left: 0;
@@ -223,26 +223,8 @@ select option:checked {
 }
 
 /* Button styling for consistency */
-button, select {
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #fff;
-    background-color: #006938; /* Green background for buttons and select */
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    -webkit-appearance: none; /* Remove default dropdown arrow in some browsers */
-    -moz-appearance: none; /* Remove default dropdown arrow in Firefox */
-    appearance: none; /* Remove default dropdown arrow in modern browsers */
-}
 
-button:hover{
-    background-color: #004d2e; /* Darker green on hover */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-}
+
 
 
 /* Custom dropdown arrow */
@@ -383,34 +365,7 @@ section {
 }
 
 
-/* Popup container */
-.popup {
-    position: fixed;
-    left: 50%;
-    top: -100px; /* Initially hidden above the screen */
-    transform: translateX(-50%);
-    background-color: #006938; /* Green background */
-    color: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 300px;
-    text-align: center;
-    z-index: 9999;
-    opacity: 0; /* Initially invisible */
-    transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out; /* Slide and fade transition */
-}
 
-/* Show the popup */
-.show {
-    top: 20px; /* Slide into view */
-    opacity: 1; /* Fade in */
-}
-
-/* Hide the popup (Fade out) */
-.hide {
-    opacity: 0; /* Fade out */
-}
 
 /* Styles for the users table */
 .users-table {
@@ -445,4 +400,20 @@ section {
 
 .edit-btn:hover, .delete-btn:hover {
     background-color: #004d2e;
+}
+
+#addUserButton, #exportChatsButton, #add-user-btn {
+    background-color: rgb(0, 115, 61);
+    color: #fff; /* White text for contrast */
+    padding: 10px 20px; /* Add padding for better spacing */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Increase font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for background color and transform */
+}
+
+#addUserButton:hover, #exportChatsButton:hover, #add-user-btn:hover {
+    background-color: #004d2e; /* Darker green on hover */
+    transform: scale(1.05); /* Slightly scale up the button for added effect */
 }

@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
     const activeChatsWidget = document.getElementById('activeChatsWidget');
     const activeSessionsSpan = document.getElementById('activeSessions');
     const refreshButton = document.getElementById('refreshButton');
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hours = d.getHours().toString().padStart(2, '0');
         const minutes = d.getMinutes().toString().padStart(2, '0');
         const seconds = d.getSeconds().toString().padStart(2, '0');
-
+    
         return `${year}/${month}/${day}, ${hours}:${minutes}:${seconds}`;
     };
 
@@ -47,100 +46,113 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Add event listener to filter table on input change
-    searchInput.addEventListener('input', filterTable);
+// Function to fetch session data
+// Function to fetch session data
+// Function to fetch session data
+const populateTable = async () => {
+    try {
+        const response = await fetch('/management-console/refresh-sessions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
 
-    // Function to populate table rows (you should replace this with your actual data fetching logic)
-    const populateTable = async () => {
-        try {
-            const response = await fetch('/management-console/refresh-sessions', {
-                method: 'POST', // Change the method to POST
-                headers: {
-                    'Content-Type': 'application/json' // Ensure the content type is JSON
-                },
-                body: JSON.stringify({}) // If needed, you can include data in the body
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-
-            const data = await response.json();
-
-            if (data.sessionData && Array.isArray(data.sessionData)) {
-                tableBody.innerHTML = '';
-
-                data.sessionData.forEach(session => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${session.UserName}</td>
-                        <td>${session.UserID}</td>
-                        <td>${session.OpenChats}</td>
-                        <td>${formatDate(session.LastSession)}</td>
-                        <td>${formatDate(session.ExpiryTime)}</td>
-                        <td>${session.IPAddress}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } else {
-                console.error('Unexpected data format:', data);
-            }
-        } catch (error) {
-            console.error('Error fetching session data:', error);
+        if (!response.ok) {
+            throw new Error('Network response was not ok.');
         }
-    };
+
+        const data = await response.json();
+
+        if (data.sessionData && Array.isArray(data.sessionData)) {
+            tableBody.innerHTML = '';
+
+            data.sessionData.forEach(session => {
+                // Format the 'CreatedAt' field using the formatDate function
+                const createdAtFormatted = formatDate(session.CreatedAt);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.UserName}</td>
+                    <td>${session.UserID}</td>
+                    <td>${session.OpenChats}</td>
+                    <td>${session.IPAddress}</td>
+                    <td>${createdAtFormatted}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            console.error('Unexpected data format:', data);
+        }
+    } catch (error) {
+        console.error('Error fetching session data:', error);
+    }
+};
+
+
+
+// Function to fetch Ollama status and update the widget
+const fetchOllamaStatus = async () => {
+    try {
+        const response = await fetch('/management-console/check-ollama', {
+            method: 'POST', // Use POST method
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({}) // Send an empty body or relevant data
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        // Update the AI Status widget with the response
+        const lastUpdatedElement = document.querySelector('.widget:nth-child(2) p:nth-child(2)');
+        const statusElement = document.querySelector('.widget:nth-child(2) p:nth-child(3)');
+
+        lastUpdatedElement.textContent = `Last Updated: ${new Date().toLocaleString()}`;
+        if (data.status === 'ok') {
+            statusElement.textContent = 'Status: Running';
+            statusElement.style.color = ''; // Reset to default color
+        } else {
+            statusElement.textContent = 'Status: Not Running';
+            statusElement.style.color = 'red'; // Set text color to red
+        }
+    } catch (error) {
+        console.error('Error fetching Ollama status:', error);
+        const lastUpdatedElement = document.querySelector('.widget:nth-child(2) p:nth-child(2)');
+        const statusElement = document.querySelector('.widget:nth-child(2) p:nth-child(3)');
+        
+        lastUpdatedElement.textContent = `Last Updated: ${new Date().toLocaleString()}`;
+        statusElement.textContent = 'Status: Error';
+        statusElement.style.color = 'red'; // Indicate error in red
+    }
+};
+
 
     // Initially populate the table with data
     populateTable();
 
+    // Initially fetch the Ollama status
+    fetchOllamaStatus();
+
+    // Set an interval to call the Ollama status function every 5 minutes (300000 milliseconds)
+    const intervalId = setInterval(fetchOllamaStatus, 300000); // 5 minutes
+
     // Event listener for refreshing sessions
     refreshButton.addEventListener('click', async () => {
         refreshButton.classList.add('spinner-active');
+        
+        // Refresh session data
+        await populateTable();
 
-        try {
-            const response = await fetch('/management-console/refresh-sessions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            });
+        // Refresh Ollama status
+        await fetchOllamaStatus();
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-
-            const data = await response.json();
-
-            if (data.totalSessions !== undefined) {
-                activeSessionsSpan.textContent = data.totalSessions;
-            } else {
-                console.error('Unexpected response data:', data);
-            }
-
-            if (data.sessionData && Array.isArray(data.sessionData)) {
-                tableBody.innerHTML = '';
-
-                data.sessionData.forEach(session => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${session.UserName}</td>
-                        <td>${session.UserID}</td>
-                        <td>${session.OpenChats}</td>
-                        <td>${formatDate(session.LastSession)}</td>
-                        <td>${formatDate(session.ExpiryTime)}</td>
-                        <td>${session.IPAddress}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } else {
-                console.error('Invalid data format:', data);
-            }
-        } catch (error) {
-            console.error('Error refreshing sessions:', error);
-        } finally {
-            refreshButton.classList.remove('spinner-active');
-        }
+        refreshButton.classList.remove('spinner-active');
     });
 
     // Event listener for exporting chats
@@ -170,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Add user button event listener
     if (addUserButton) {
         addUserButton.addEventListener('click', async () => {
             try {
@@ -179,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
     
                 if (response.ok) {
-                    // The backend will handle setting the active tab; just redirect
                     window.location.href = '/management-console/profiles';
                 } else {
                     console.error('Error navigating to profiles:', await response.text());
@@ -189,5 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
 
+    // Event listener for fetching Ollama status on widget click
+    const aiStatusWidget = document.querySelector('.widget:nth-child(2)');
+    aiStatusWidget.addEventListener('click', fetchOllamaStatus);
+});

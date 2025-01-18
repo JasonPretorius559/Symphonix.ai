@@ -4,9 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 Not Found</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffffff; /* Clean white background */
+            color: #333; /* Dark text for readability */
+            text-align: center;
+            padding: 50px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1s ease-in; /* Adding fade-in animation for the whole body */
+        }
+
+        /* Header Styles */
+        h1 {
+            font-size: 80px;
+            margin-bottom: 20px;
+            font-weight: normal;  /* Lighten the font weight for minimalism */
+            opacity: 0; /* Start hidden for animation */
+            animation: slideIn 1s ease forwards; /* Slide-in animation for h1 */
+        }
+
+        /* Paragraph Styles */
+        p {
+            font-size: 20px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.5;
+            opacity: 0; /* Start hidden for animation */
+            animation: fadeIn 1s ease forwards 0.5s; /* Fade-in with delay for paragraph */
+        }
+
+        /* Button Styles */
+        .home-button {
+            background-color: transparent; /* Transparent button for minimalism */
+            color: #007bff; /* Bootstrap primary color */
+            padding: 10px 20px;
+            text-decoration: none;
+            border: 2px solid #007bff; /* Outline style */
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-size: 18px;
+            opacity: 0; /* Start hidden for animation */
+            animation: fadeIn 1s ease forwards 1s; /* Fade-in with delay for button */
+        }
+
+        .home-button:hover {
+            background-color: #007bff; /* Fill color on hover */
+            color: #fff; /* Change text color on hover */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 50px;
+            }
+
+            p {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 40px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .home-button {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>404 - Page Not Found</h1>
-    <p>Sorry, the page you are looking for does not exist.</p>
+    <h1>404</h1>
+    <p>Page Not Found</p>
+    <a href="/" class="home-button">Go to Homepage</a>
 </body>
 </html>

@@ -7,34 +7,45 @@ const getTotalSessions = async () => {
     let conn;
     try {
         conn = await connection.getConnection(); // Get a connection from the pool
-        
+
         // Get the current timestamp in seconds
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        
-        // Log the current timestamp for debugging purposes
-        console.log("Current Timestamp (in seconds):", currentTimestamp);
-        
+
         // Define the expiration period in seconds (e.g., 24 hours)
         const expirationPeriod = 24 * 60 * 60; // 24 hours
-        
-        // Log the calculated expiration timestamp
+
+        // Calculate the expiration timestamp
         const expirationTimestamp = currentTimestamp - expirationPeriod;
+
+        // Log the calculated expiration timestamp for debugging purposes
         console.log("Expiration Timestamp:", expirationTimestamp);
-        
-        // Query to fetch active sessions
+
+        // Query to fetch the count of sessions created in the last 24 hours
         const [rows] = await conn.execute(
-            'SELECT COUNT(*) AS active_count FROM sessions WHERE expires >= ?',
+            'SELECT COUNT(*) AS active_count FROM sessions WHERE UNIX_TIMESTAMP(created_at) >= ?',
             [expirationTimestamp]
         );
-        
+
+        // Log the active count for debugging purposes
+        console.log("Active sessions count:", rows[0].active_count);
+
+        // Return the count of active sessions
         return rows[0].active_count;
     } catch (error) {
         console.error("Error fetching active sessions:", error.message);
         throw error;
     } finally {
-        if (conn) conn.release(); // Release the connection back to the pool
+        if (conn) {
+            try {
+                conn.release(); // Release the connection back to the pool
+            } catch (releaseError) {
+                console.error("Error releasing connection:", releaseError.message);
+            }
+        }
     }
 };
+
+
 
 
 const getSessionData = async () => {
@@ -45,15 +56,16 @@ const getSessionData = async () => {
             SELECT 
                 users.username AS UserName, 
                 sessions.userid AS UserID,
-                (SELECT COUNT(*) FROM chats WHERE chats.userid = sessions.userid) AS OpenChats,
-                sessions.last_interaction AS LastSession,
-                FROM_UNIXTIME(sessions.expires) AS ExpiryTime,
-                sessions.user_ip_address AS IPAddress
+                (SELECT COUNT(*) FROM chats WHERE chats.userid = sessions.userid AND delete_status = 0) AS OpenChats,
+                sessions.user_ip_address AS IPAddress,
+                sessions.created_at AS CreatedAt
             FROM sessions
             JOIN users ON sessions.userid = users.userid
-            WHERE sessions.expires > UNIX_TIMESTAMP()  -- Only include active sessions
-              AND sessions.created_at <= NOW()           -- Ensure sessions have been created
-            ORDER BY LastSession DESC
+            WHERE sessions.created_at <= NOW()           -- Ensure sessions have been created
+            ORDER BY sessions.created_at DESC;
+
+
+
         `);
         return rows; // Return the array of session data
     } catch (error) {
@@ -74,18 +86,12 @@ async function exportChatsToCSV(req, res) {
                 users.username AS UserName, 
                 sessions.userid AS UserID,
                 (SELECT COUNT(*) FROM chats WHERE chats.userid = sessions.userid) AS OpenChats,
-                sessions.last_interaction AS LastSession,
-                FROM_UNIXTIME(sessions.expires) AS ExpiryTime,
-                sessions.user_ip_address AS IPAddress
+                sessions.user_ip_address AS IPAddress,
+                sessions.created_at AS CreatedAt
             FROM sessions
             JOIN users ON sessions.userid = users.userid
-            WHERE sessions.expires > UNIX_TIMESTAMP()  -- Only include active sessions
-              AND sessions.created_at <= NOW()           -- Ensure sessions have been created
-            ORDER BY LastSession DESC
+            ORDER BY sessions.created_at DESC
         `);
-
-        // No need to release the connection manually if using mysql2/promise
-        // conn.release(); // Remove this line
 
         if (rows.length === 0) {
             return res.status(404).send('No data available to export.');
