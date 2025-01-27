@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-   ome // Add click event listener to dropdown button to toggle the dropdown
+   // Add click event listener to dropdown button to toggle the dropdown
     const dropbtn = document.querySelector('.dropbtn');
     const dropdownContent = document.querySelector('.dropdown-content');
 
