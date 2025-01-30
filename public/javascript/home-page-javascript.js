@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/home/api/chats');
             if (!response.ok) throw new Error(`Failed to fetch chats: ${response.status}`);
 
-            const result = await response.json();
+            const result = await response.json(); 
             if (result.success) {
                 const chats = result.chats;
                 const fragment = document.createDocumentFragment();
