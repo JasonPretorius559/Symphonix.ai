@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Refresh the sidebar with the latest chat list
     async function refreshSidebar() {
         try {
-            const response = await fetch('/home/chats');
+            const response = await fetch('/home/api/chats');
             if (!response.ok) throw new Error(`Failed to fetch chats: ${response.status}`);
 
             const result = await response.json();
@@ -144,12 +144,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chatId }),
             });
-
+    
             const result = await response.json();
             if (result.success) {
                 // Refresh the sidebar to reflect the deletion
                 await refreshSidebar();
-
+    
                 // Clear the messages container if the deleted chat was active
                 if (currentChatId === chatId) {
                     messagesContainer.innerHTML = '';

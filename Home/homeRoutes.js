@@ -47,6 +47,25 @@ router.get('/messages/:chatId?', async (req, res) => {
 });
 
 
+// Fetch user chats dynamically
+router.get('/api/chats', async (req, res) => {
+    try {
+        const userId = req.session.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({ success: false, error: 'User not authenticated' });
+        }
+
+        const chats = await getChats(userId);
+        res.json({ success: true, chats });
+    } catch (error) {
+        console.error("Error fetching chats:", error.message);
+        res.status(500).json({ success: false, error: 'Failed to fetch chats' });
+    }
+});
+
+
+
 
 router.post('/insert-message', InsertMessage);
 
