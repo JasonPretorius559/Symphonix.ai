@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('sendButton');
     const messagesContainer = document.querySelector('.messages');
     const logoutOption = document.getElementById('logoutOption');
-    const dropdownContent = document.querySelector('.dropdown-content');
-    const dropdownButton = document.querySelector('.dropdown .dropbtn');
     const newChatButton = document.getElementById('newChatButton');
     const spinnerContainer = document.getElementById('spinnerContainer');
 
@@ -14,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentChatId = null;
     let isSending = false;
     let isCooldownActive = false;
+    
 
     // Utility Functions
     function cleanMessageText(text) {
@@ -22,30 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return cleanedWords.join(' ');
     }
 
-
-
     function adjustHeight() {
-        // Reset height to allow for proper calculation of scrollHeight
-        messageInput.style.height = "auto";
-    
-        // Adjust height based on scrollHeight, respecting the max-height
+        messageInput.style.height = 'auto';
         const newHeight = Math.min(messageInput.scrollHeight, 200); // 200px is the max-height
         messageInput.style.height = `${newHeight}px`;
-    
-        // Add `overflow-y: auto` when max height is reached
-        if (messageInput.scrollHeight > 200) {
-            messageInput.style.overflowY = "auto";
-        } else {
-            messageInput.style.overflowY = "hidden";
-        }
+        messageInput.style.overflowY = messageInput.scrollHeight > 200 ? 'auto' : 'hidden';
     }
-    
-    // Attach the height adjustment logic to input events
-    messageInput.addEventListener("input", adjustHeight);
-    
-    // Initialize height adjustment on page load if needed
-    window.addEventListener("DOMContentLoaded", adjustHeight);
-    
 
     function resetSendButton() {
         isSending = false;
@@ -60,6 +41,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+        // Refresh the sidebar with the latest chat list
+        async function refreshSidebar() {
+            try {
+                const response = await fetch('/home/chats');
+                if (!response.ok) throw new Error(`Failed to fetch chats: ${response.status}`);
+    
+                const result = await response.json();
+                if (result.success) {
+                    const chats = result.chats;
+                    const fragment = document.createDocumentFragment();
+    
+                    // Clear the existing chat list
+                    chatList.innerHTML = '';
+    
+                    // Add each chat to the fragment
+                    chats.forEach((chat) => {
+                        const chatItem = document.createElement('li');
+                        chatItem.classList.add('chat-item');
+                        chatItem.setAttribute('data-chat-id', chat.chat_id);
+                        chatItem.innerHTML = `
+                            <span>${chat.name}</span>
+                            <button class="delete-chat" data-chat-id="${chat.chat_id}"></button>
+                        `;
+                        fragment.appendChild(chatItem);
+                    });
+    
+                    // Append the fragment to the chat list
+                    chatList.appendChild(fragment);
+    
+                    // Highlight the active chat
+                    if (currentChatId) {
+                        const activeChat = chatList.querySelector(`[data-chat-id="${currentChatId}"]`);
+                        if (activeChat) activeChat.classList.add('active');
+                    }
+                } else {
+                    console.error('Error fetching chats:', result.error);
+                }
+            } catch (error) {
+                console.error('An unexpected error occurred:', error.message);
+            }
+        }
+
     function handleNewChat() {
         const activeChat = document.querySelector('.chat-item.active');
         if (activeChat) activeChat.classList.remove('active');
@@ -68,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         adjustHeight();
         currentChatId = null;
     }
+    
 
     // Event Handlers
     async function handleChatItemClick(chatItem) {
@@ -89,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/home/delete-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chatId })
+                body: JSON.stringify({ chatId }),
             });
 
             const result = await response.json();
@@ -116,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const messages = result.messages;
                 messagesContainer.innerHTML = '';
 
-                messages.forEach(message => {
+                messages.forEach((message) => {
                     const messageElement = document.createElement('div');
                     messageElement.classList.add('message');
                     if (message.userid && message.user_message) {
@@ -140,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    sendButton.addEventListener('click', async () => {
+    async function sendMessage() {
         if (isSending) return;
         isSending = true;
         sendButton.disabled = true;
@@ -148,78 +172,85 @@ document.addEventListener('DOMContentLoaded', () => {
         let messageText = messageInput.value.trim();
         messageText = cleanMessageText(messageText);
 
-        if (messageText) {
-            const userMessageElement = document.createElement('div');
-            userMessageElement.classList.add('message', 'user');
-            userMessageElement.textContent = messageText;
-            messagesContainer.appendChild(userMessageElement);
-
-            messageInput.value = '';
-            adjustHeight();
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            let aiMessageContent = '';
-            try {
-                const response = await fetch('http://192.168.0.183:11434/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'riot',
-                        messages: [{ role: 'user', content: messageText }],
-                        stream: true
-                    })
-                });
-
-                if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder('utf-8');
-                let messageElement = document.createElement('div');
-                messageElement.classList.add('message', 'bot');
-                messagesContainer.appendChild(messageElement);
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value, { stream: true });
-                    chunk.split('\n').forEach(line => {
-                        if (line.startsWith('data: ')) {
-                            const jsonData = line.substring(6);
-                            if (jsonData !== '[DONE]') {
-                                try {
-                                    const data = JSON.parse(jsonData);
-                                    const aiContent = data.choices[0].delta.content || '';
-                                    aiMessageContent += aiContent;
-                                    messageElement.innerHTML += aiContent;
-                                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                                } catch (error) {
-                                    console.error('Error parsing JSON:', error);
-                                }
-                            }
-                        }
-                    });
-                }
-
-                await fetch('/home/insert-message', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chatId: currentChatId,
-                        userMessage: messageText,
-                        aiMessage: aiMessageContent
-                    })
-                });
-            } catch (error) {
-                console.error('An unexpected error occurred:', error.message);
-            } finally {
-                resetSendButton();
-            }
-        } else {
+        if (!messageText) {
             console.warn('Message cannot be empty.');
             resetSendButton();
+            return;
         }
-    });
+
+        // Add user message to the UI
+        const userMessageElement = document.createElement('div');
+        userMessageElement.classList.add('message', 'user');
+        userMessageElement.textContent = messageText;
+        messagesContainer.appendChild(userMessageElement);
+
+        messageInput.value = '';
+        adjustHeight();
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        try {
+            // Send message to the AI API
+            const response = await fetch('http://AITEST:11434/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'riot',
+                    messages: [{ role: 'user', content: messageText }],
+                    stream: true,
+                }),
+            });
+
+            if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'bot');
+            messagesContainer.appendChild(messageElement);
+
+            let aiMessageContent = '';
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                chunk.split('\n').forEach((line) => {
+                    if (line.startsWith('data: ')) {
+                        const jsonData = line.substring(6);
+                        if (jsonData !== '[DONE]') {
+                            try {
+                                const data = JSON.parse(jsonData);
+                                const aiContent = data.choices[0].delta.content || '';
+                                aiMessageContent += aiContent;
+                                messageElement.innerHTML += aiContent;
+                                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                            } catch (error) {
+                                console.error('Error parsing JSON:', error);
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Save the conversation to the database
+            await fetch('/home/insert-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chatId: currentChatId,
+                    userMessage: messageText,
+                    aiMessage: aiMessageContent,
+                }),
+            });
+        } catch (error) {
+            console.error('An unexpected error occurred:', error.message);
+        } finally {
+            resetSendButton();
+        }
+    }
+
+    // Event Listeners
+    sendButton.addEventListener('click', sendMessage);
 
     newChatButton.addEventListener('click', () => {
         if (isCooldownActive) return;
@@ -236,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch('/logout', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
                 });
 
                 if (response.ok) {
@@ -251,10 +282,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     chatList.addEventListener('click', (event) => {
-        if (event.target.classList.contains('chat-item')) {
-            handleChatItemClick(event.target);
-        } else if (event.target.classList.contains('delete-chat')) {
-            handleChatDelete(event.target.closest('.chat-item'));
+        const chatItem = event.target.closest('.chat-item');
+        if (chatItem) {
+            if (event.target.classList.contains('delete-chat')) {
+                handleChatDelete(chatItem);
+            } else {
+                handleChatItemClick(chatItem);
+            }
         }
     });
 

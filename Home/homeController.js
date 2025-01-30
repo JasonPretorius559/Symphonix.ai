@@ -44,13 +44,13 @@ const InsertMessage = async (req, res) => {
 
     try {
         let newChatId = chatId;
-        let defaultName = 'Default Chat'; // Fallback name
+        let chatName = generateChatName(userMessage, aiMessage); // Generate a meaningful chat name
 
         if (!chatId) {
             // Create a new chat
             const [result] = await connection.execute(
                 'INSERT INTO chats (userid, name, created_at) VALUES (?, ?, NOW())',
-                [userId, defaultName]
+                [userId, chatName]
             );
             newChatId = result.insertId;
         }
@@ -58,38 +58,58 @@ const InsertMessage = async (req, res) => {
         // Insert user message into the database
         await connection.execute(
             'INSERT INTO messages (chat_id, userid, user_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
-            [newChatId, userId, userMessage, defaultName]
+            [newChatId, userId, userMessage, chatName]
         );
 
         if (aiMessage) {
-            // Set the default name to the first sentence of the AI's message
-            const firstSentence = aiMessage.split('. ')[0]; // Get the first sentence
-            defaultName = firstSentence || defaultName;
-
-            // Update the chat name in the `chats` table
-            await connection.execute(
-                'UPDATE chats SET name = ? WHERE id = ?',
-                [defaultName, newChatId]
-            );
-
             // Insert AI response into the database
             await connection.execute(
                 'INSERT INTO messages (chat_id, userid, ai_message, name, timestamp) VALUES (?, ?, ?, ?, NOW())',
-                [newChatId, null, aiMessage, defaultName]
+                [newChatId, null, aiMessage, chatName]
             );
         }
 
         // Send the new chatId back if a new chat was created
         if (!chatId) {
-            return res.status(201).json({ success: true, chatId: newChatId });
+            return res.status(201).json({ success: true, chatId: newChatId, chatName });
         } else {
             res.status(204).send(); // No content for existing chats
         }
 
     } catch (error) {
         console.error('Error sending message:', error.message);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
+};
+
+// Helper function to generate a meaningful chat name
+const generateChatName = (userMessage, aiMessage) => {
+    const maxLength = 50; // Maximum length for chat names
+    let name = 'New Chat'; // Fallback name
+
+    // Use the first sentence of the user's message if available
+    if (userMessage) {
+        const firstSentence = userMessage.split('. ')[0]; // Get the first sentence
+        if (firstSentence) {
+            name = firstSentence.substring(0, maxLength); // Truncate if necessary
+            return name;
+        }
+    }
+
+    // Use the first sentence of the AI's message if user message is not suitable
+    if (aiMessage) {
+        const firstSentence = aiMessage.split('. ')[0]; // Get the first sentence
+        if (firstSentence) {
+            name = firstSentence.substring(0, maxLength); // Truncate if necessary
+            return name;
+        }
+    }
+
+    // Append a timestamp to the fallback name to avoid duplicates
+    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    name = `${name} - ${timestamp}`;
+
+    return name;
 };
 
 
