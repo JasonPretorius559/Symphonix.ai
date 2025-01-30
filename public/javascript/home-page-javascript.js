@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentChatId = null;
     let isSending = false;
     let isCooldownActive = false;
-    
 
     // Utility Functions
     function cleanMessageText(text) {
@@ -41,59 +40,88 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-        // Refresh the sidebar with the latest chat list
-        async function refreshSidebar() {
-            try {
-                const response = await fetch('/home/chats');
-                if (!response.ok) throw new Error(`Failed to fetch chats: ${response.status}`);
-    
-                const result = await response.json();
-                if (result.success) {
-                    const chats = result.chats;
-                    const fragment = document.createDocumentFragment();
-    
-                    // Clear the existing chat list
-                    chatList.innerHTML = '';
-    
-                    // Add each chat to the fragment
-                    chats.forEach((chat) => {
-                        const chatItem = document.createElement('li');
-                        chatItem.classList.add('chat-item');
-                        chatItem.setAttribute('data-chat-id', chat.chat_id);
-                        chatItem.innerHTML = `
-                            <span>${chat.name}</span>
-                            <button class="delete-chat" data-chat-id="${chat.chat_id}"></button>
-                        `;
-                        fragment.appendChild(chatItem);
-                    });
-    
-                    // Append the fragment to the chat list
-                    chatList.appendChild(fragment);
-    
-                    // Highlight the active chat
-                    if (currentChatId) {
-                        const activeChat = chatList.querySelector(`[data-chat-id="${currentChatId}"]`);
-                        if (activeChat) activeChat.classList.add('active');
-                    }
-                } else {
-                    console.error('Error fetching chats:', result.error);
+    // Refresh the sidebar with the latest chat list
+    async function refreshSidebar() {
+        try {
+            const response = await fetch('/home/chats');
+            if (!response.ok) throw new Error(`Failed to fetch chats: ${response.status}`);
+
+            const result = await response.json();
+            if (result.success) {
+                const chats = result.chats;
+                const fragment = document.createDocumentFragment();
+
+                // Clear the existing chat list
+                chatList.innerHTML = '';
+
+                // Add each chat to the fragment
+                chats.forEach((chat) => {
+                    const chatItem = document.createElement('li');
+                    chatItem.classList.add('chat-item');
+                    chatItem.setAttribute('data-chat-id', chat.chat_id);
+                    chatItem.innerHTML = `
+                        <span>${chat.name}</span>
+                        <button class="delete-chat" data-chat-id="${chat.chat_id}"></button>
+                    `;
+                    fragment.appendChild(chatItem);
+                });
+
+                // Append the fragment to the chat list
+                chatList.appendChild(fragment);
+
+                // Highlight the active chat
+                if (currentChatId) {
+                    const activeChat = chatList.querySelector(`[data-chat-id="${currentChatId}"]`);
+                    if (activeChat) activeChat.classList.add('active');
                 }
-            } catch (error) {
-                console.error('An unexpected error occurred:', error.message);
+            } else {
+                console.error('Error fetching chats:', result.error);
             }
+        } catch (error) {
+            console.error('An unexpected error occurred:', error.message);
         }
-
-    function handleNewChat() {
-        const activeChat = document.querySelector('.chat-item.active');
-        if (activeChat) activeChat.classList.remove('active');
-        messagesContainer.innerHTML = '';
-        messageInput.value = '';
-        adjustHeight();
-        currentChatId = null;
     }
-    
 
-    // Event Handlers
+    // Handle new chat creation
+    async function handleNewChat() {
+        if (isCooldownActive) return;
+        isCooldownActive = true;
+
+        try {
+            const response = await fetch('/home/create-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: 'New Chat' }), // Default chat name
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                currentChatId = result.chatId;
+
+                // Refresh the sidebar to show the new chat
+                await refreshSidebar();
+
+                // Clear the messages container
+                messagesContainer.innerHTML = '';
+
+                // Reset the input field
+                messageInput.value = '';
+                adjustHeight();
+
+                // Highlight the new chat
+                const newChatItem = chatList.querySelector(`[data-chat-id="${currentChatId}"]`);
+                if (newChatItem) newChatItem.classList.add('active');
+            } else {
+                console.error('Error creating chat:', result.error);
+            }
+        } catch (error) {
+            console.error('An unexpected error occurred:', error.message);
+        } finally {
+            isCooldownActive = false;
+        }
+    }
+
+    // Handle chat item click
     async function handleChatItemClick(chatItem) {
         const activeChat = document.querySelector('.chat-item.active');
         if (activeChat) activeChat.classList.remove('active');
@@ -107,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Handle chat deletion
     async function handleChatDelete(chatItem) {
         const chatId = chatItem.getAttribute('data-chat-id');
         try {
@@ -118,9 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
             if (result.success) {
-                chatItem.remove();
-                messagesContainer.innerHTML = '';
-                if (currentChatId === chatId) currentChatId = null;
+                // Refresh the sidebar to reflect the deletion
+                await refreshSidebar();
+
+                // Clear the messages container if the deleted chat was active
+                if (currentChatId === chatId) {
+                    messagesContainer.innerHTML = '';
+                    currentChatId = null;
+                }
             } else {
                 console.error(result.error);
             }
@@ -129,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Load messages for a specific chat
     async function loadMessages(chatId) {
         showSpinner(true);
         try {
@@ -164,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Send a message to the AI and save it to the database
     async function sendMessage() {
         if (isSending) return;
         isSending = true;
@@ -299,4 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sendButton.click();
         }
     });
+
+    // Initial load: Refresh the sidebar
+    refreshSidebar();
 });
